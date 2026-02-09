@@ -1,16 +1,15 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Logo from './../../assets/image/dev_logo.png';
-import { useNavigate } from 'react-router-dom';
+
 // --- Recursive Sidebar Item (Tree Structure) ---
 const SidebarItem = ({ item, level = 0 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
 
   return (
-
     <div className="relative select-none ">
-      
       <div 
         className="flex items-center py-1.5 px-4 cursor-pointer hover:bg-gray-100 text-[#333] transition-colors relative group"
         onClick={() => hasChildren && setIsOpen(!isOpen)}
@@ -47,7 +46,37 @@ export default function Navbar() {
   const [showVirtualMarket, setShowVirtualMarket] = useState(false);
   const [showReports, setShowReports] = useState(false);
   const [showMasterDropdown, setShowMasterDropdown] = useState(false);
-const navigate = useNavigate(); 
+  const [adminName, setAdminName] = useState("Loading..."); // User Name State
+  const navigate = useNavigate(); 
+
+  // --- Fetch User Profile for Name ---
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await axios.get('http://localhost:3000/api/users/get-profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.data.success) {
+          const name = response.data.data.client_name || response.data.data.full_name || "Admin";
+          setAdminName(name);
+        }
+      } catch (err) {
+        console.error("Navbar profile fetch error:", err);
+        setAdminName("Admin");
+      }
+    };
+    fetchAdminProfile();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/admin-login');
+  };
+
   const sportsData = [
     {
       id: "all-sports",
@@ -123,7 +152,6 @@ const navigate = useNavigate();
     },
   ];
 
-  // Live Market items with paths
   const liveMarketItems = [
     { title: "Premium Casino", path: "/premium-casino" },
     { title: "Tembo Casino", path: "/tembo-casino" },
@@ -147,7 +175,6 @@ const navigate = useNavigate();
     { title: "Live Teenpatti", path: "/live-teenpatti" }
   ];
 
-  // Virtual Market items with paths
   const virtualMarketItems = [
     { title: "20-20 DTL", path: "/20-20-dtl" },
     { title: "Amar Akbar Anthony", path: "/amar-akbar-anthony" },
@@ -177,23 +204,22 @@ const navigate = useNavigate();
   const masterFields = [
     { title: "Secure Auth Verification", path: "/secure-auth" },
     { title: "Change Password", path: "/change-password" },
-    { title: "Logout", path: "/logout" }
+    { title: "Logout", path: "/admin-login" }
   ];
 
   return (
     <>
-      <nav className="bg-[#0088CC] text-white fixed top-0 left-0 right-0 z-50 font-sans shadow-md  h-[85px] lg:h-[45px]">
+      <nav className="bg-[#0088CC] text-white fixed top-0 left-0 right-0 z-50 font-sans shadow-md h-[85px] lg:h-[45px]">
         
         {/* LINE 1 */}
         <div className="h-[45px] flex items-center justify-between px-4">
           <div className="flex items-center gap-3 h-full">
-            {/* <img src={Logo} alt="Logo" className="h-[30px] w-auto cursor-pointer" onClick={() => navigate('/admin')} /> */}
             <img 
-  src={Logo} 
-  alt="Logo" 
-  className="h-[30px] w-auto cursor-pointer" 
-  onClick={() => navigate('/admin')} // navigate function use karein
-/>
+              src={Logo} 
+              alt="Logo" 
+              className="h-[30px] w-auto cursor-pointer" 
+              onClick={() => navigate('/admin')} 
+            />
             <button className="hover:bg-black/20 p-1 rounded transition-colors ml-1" onClick={() => setIsSidebarOpen(true)}>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" /></svg>
             </button>
@@ -202,12 +228,16 @@ const navigate = useNavigate();
           <div className="flex items-center gap-3">
             <div className="relative h-[45px]" onMouseEnter={() => setShowMasterDropdown(true)} onMouseLeave={() => setShowMasterDropdown(false)}>
               <div className="hover:bg-black px-3 h-full flex items-center gap-1 cursor-pointer text-[13px] font-bold">
-                Masterss1 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                {adminName} <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
               </div>
               {showMasterDropdown && (
                 <div className="absolute top-[45px] right-0 w-56 bg-[#0088CC] shadow-2xl py-1 border-t border-white/10 z-[100]">
                   {masterFields.map((field, i) => (
-                    <Link key={i} to={field.path} onClick={() => setShowMasterDropdown(false)} className={`block px-4 py-2 hover:bg-[#2C3E50] text-[13px] border-b border-white/5 last:border-none ${field.title === 'Logout' ? 'font-bold bg-black/10' : ''}`}>{field.title}</Link>
+                    field.title === 'Logout' ? (
+                      <button key={i} onClick={handleLogout} className="w-full text-left block px-4 py-2 hover:bg-[#2C3E50] text-[13px] font-bold bg-black/10">Logout</button>
+                    ) : (
+                      <Link key={i} to={field.path} onClick={() => setShowMasterDropdown(false)} className="block px-4 py-2 hover:bg-[#2C3E50] text-[13px] border-b border-white/5 last:border-none">{field.title}</Link>
+                    )
                   ))}
                 </div>
               )}

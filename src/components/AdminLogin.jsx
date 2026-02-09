@@ -105,7 +105,7 @@ const LoginPage = () => {
             disabled={loading}
             className={`w-full bg-[#0288d1] hover:bg-[#0277bd] text-white font-bold py-3 rounded flex items-center justify-center gap-2 transition-colors uppercase text-sm mt-6 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            {loading ? 'Processing...' : 'Login'} <span>➜</span>
+            {loading ? 'Processing...' : 'Sign In '} <span>➜</span>
           </button>
         </form>
       </div>

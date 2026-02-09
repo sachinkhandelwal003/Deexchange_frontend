@@ -69,7 +69,7 @@ const LoginPage = () => {
       <div className="bg-white w-full max-w-md rounded-md shadow-2xl overflow-hidden p-6 sm:p-8">
         <div className="text-center mb-8">
           <h2 className="text-[#0288d1] text-2xl font-bold flex items-center justify-center gap-2 text-uppercase">
-            Sign In
+            Login
           </h2>
         </div>
 
