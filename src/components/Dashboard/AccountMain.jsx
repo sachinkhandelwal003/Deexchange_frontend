@@ -95,17 +95,38 @@ export default function AccountList() {
     } catch (err) { console.error("Status API Error:", err); }
   };
 
+  // --- UPDATED SUBMIT LOGIC ---
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
       let url = '';
-      let payload = { user_id: selectedAccount._id, password: formData.password };
+      let payload = { user_id: selectedAccount._id };
 
-      if (modalType === 'L') {
-        url = 'http://localhost:3000/api/admin/update-user-exposure-limit';
-        payload.exposure_limit = formData.newLimit;
+      if (modalType === 'D' || modalType === 'W') {
+        url = modalType === 'D' 
+          ? 'http://localhost:3000/api/admin/make-deposit-transaction' 
+          : 'http://localhost:3000/api/admin/make-withdraw-transaction';
+        payload.password = formData.password;
+        payload.amount = Number(formData.amount);
+        payload.remark = formData.remark;
+      } 
+      else if (modalType === 'L') {
+        url = 'http://localhost:3000/api/admin/set-exposure-limit';
+        payload.transaction_password = formData.password;
+        payload.old_exposure_limit = Number(exposureData.exposure_limit);
+        payload.new_exposure_limit = Number(formData.newLimit);
       }
-      // Add other modal submit URLs here as needed
+      else if (modalType === 'C') {
+        url = 'http://localhost:3000/api/admin/update-credit-reference';
+        payload.transaction_password = formData.password;
+        payload.old_credit = Number(selectedAccount.credit_ref || 0);
+        payload.new_credit = Number(formData.newCredit);
+      }
+      else if (modalType === 'P') {
+        url = 'http://localhost:3000/api/admin/change-users-password';
+        payload.transaction_password = formData.password;
+        payload.new_password = formData.newPass;
+      }
 
       if(!url) return;
 
@@ -139,10 +160,14 @@ export default function AccountList() {
     setExposureData({ exposure_limit: 0 });
   };
 
-  // Calculation logic
+  // --- CALCULATION LOGIC ---
   const inputAmt = parseFloat(formData.amount) || 0;
-  let adminCalc = apiBalances.admin_current_balance + (modalType === 'W' ? inputAmt : -inputAmt);
-  let userCalc = apiBalances.user_current_balance + (modalType === 'D' ? inputAmt : -inputAmt);
+  const CONSTANT_VAL = 0.62;
+  
+  // Admin calculation: Admin Balance - 0.62 - Input
+  let adminFinal = apiBalances.admin_current_balance - CONSTANT_VAL - inputAmt;
+  // User calculation: 0.62 + Input
+  let userFinal = CONSTANT_VAL + inputAmt;
 
   return (
     <div className="w-full pt-0 px-0 bg-white font-sans relative">
@@ -184,11 +209,6 @@ export default function AccountList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              <tr className="bg-[#e2e2e2] border-b-2 border-gray-400 font-black">
-                <td className="px-4 py-2 border-r border-gray-300"></td>
-                <td className="px-4 py-2 border-r border-gray-300 text-right">50,000</td>
-                <td colSpan={5}></td>
-              </tr>
               {loading ? (
                 <tr><td colSpan={7} className="py-12 text-center text-gray-500 font-black">SEARCHING...</td></tr>
               ) : (
@@ -209,7 +229,7 @@ export default function AccountList() {
                       </div>
                     </td>
                     <td className="px-4 py-2 border-r border-gray-300 text-center font-bold">
-                      {acc.exposure_limit || acc.exposureLimit || 0}
+                      {acc.exposure_limit || 0}
                     </td>
                     <td className="px-4 py-2 border-r border-gray-300 text-center font-bold">{acc.defaultPercent || 0}</td>
                     <td className="px-4 py-2 whitespace-nowrap">
@@ -217,7 +237,6 @@ export default function AccountList() {
                             {['D', 'W', 'L', 'C', 'P', 'S'].map(btn => (
                               <button key={btn} onClick={() => openModal(btn, acc)} className="w-8 h-7 bg-[#111] text-white rounded-[3px] text-[12px] font-black uppercase shadow-md active:bg-black transition-all">{btn}</button>
                             ))}
-                            <button className="bg-[#111] text-white px-4 h-7 rounded-[3px] text-[12px] font-black uppercase shadow-md">MORE</button>
                         </div>
                     </td>
                   </tr>
@@ -234,7 +253,7 @@ export default function AccountList() {
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-xl font-medium text-gray-700">
                 {modalType === 'D' && 'Deposit'} {modalType === 'W' && 'Withdraw'} 
-                {modalType === 'L' && 'Exposure Limit'} {modalType === 'C' && 'Credit'} 
+                {modalType === 'L' && 'Exposure Limit'} {modalType === 'C' && 'Credit Reference'} 
                 {modalType === 'P' && 'Password'} {modalType === 'S' && 'Change Status'}
               </h2>
               <button onClick={closeModal} className="bg-[#0088CC] rounded-full p-1 shadow-md hover:bg-red-500 transition-colors">
@@ -248,35 +267,43 @@ export default function AccountList() {
                   <div className="flex items-center gap-10">
                     <label className="w-24 text-[15px] text-gray-800 capitalize font-medium">{adminProfile.client_name}</label>
                     <div className="flex-1 flex gap-4">
-                      <input disabled value={apiBalances.admin_current_balance} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold" />
-                      <input disabled value={adminCalc} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold" />
+                      <input disabled value={apiBalances.admin_current_balance} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold text-gray-600" />
+                      <input disabled value={adminFinal.toFixed(2)} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold text-red-600" />
                     </div>
                   </div>
                   <div className="flex items-center gap-10">
                     <label className="w-24 text-[15px] text-gray-800 capitalize font-medium">{selectedAccount?.client_name}</label>
                     <div className="flex-1 flex gap-4">
-                      <input disabled value={apiBalances.user_current_balance} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold" />
-                      <input disabled value={userCalc} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold" />
+                      <input disabled value={CONSTANT_VAL} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold text-gray-600" />
+                      <input disabled value={userFinal.toFixed(2)} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold text-green-600" />
                     </div>
                   </div>
                   <div className="flex items-center gap-10">
                     <label className="w-24 text-[15px] text-gray-800">Amount</label>
-                    <input type="number" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} className="flex-1 bg-[#F0F7FF] border border-[#B8D1F3] p-2 outline-none" />
+                    <input type="number" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} className="flex-1 bg-[#F0F7FF] border border-[#B8D1F3] p-2 outline-none font-bold text-blue-700" />
                   </div>
                 </>
               )}
 
               {modalType === 'L' && (
-                <>
-                  <div className="flex items-center gap-10">
-                    <label className="w-24 text-[15px] text-gray-800">Old Limit</label>
-                    <input disabled value={exposureData.exposure_limit} className="flex-1 bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold" />
-                  </div>
-                  <div className="flex items-center gap-10">
-                    <label className="w-24 text-[15px] text-gray-800">New Limit</label>
-                    <input type="number" value={formData.newLimit} onChange={(e) => setFormData({...formData, newLimit: e.target.value})} className="flex-1 bg-[#F0F7FF] border border-[#B8D1F3] p-2 outline-none" />
-                  </div>
-                </>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-10"><label className="w-24 text-[15px] text-gray-800">Old Limit</label><input disabled value={exposureData.exposure_limit} className="flex-1 bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold" /></div>
+                  <div className="flex items-center gap-10"><label className="w-24 text-[15px] text-gray-800">New Limit</label><input type="number" value={formData.newLimit} onChange={(e) => setFormData({...formData, newLimit: e.target.value})} className="flex-1 bg-[#F0F7FF] border border-[#B8D1F3] p-2 outline-none font-bold" /></div>
+                </div>
+              )}
+
+              {modalType === 'C' && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-10"><label className="w-24 text-[15px] text-gray-800">Old Credit</label><input disabled value={selectedAccount?.credit_ref || 0} className="flex-1 bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold" /></div>
+                  <div className="flex items-center gap-10"><label className="w-24 text-[15px] text-gray-800">New Credit</label><input type="number" value={formData.newCredit} onChange={(e) => setFormData({...formData, newCredit: e.target.value})} className="flex-1 bg-[#F0F7FF] border border-[#B8D1F3] p-2 outline-none font-bold" /></div>
+                </div>
+              )}
+
+              {modalType === 'P' && (
+                <div className="flex items-center gap-10">
+                  <label className="w-24 text-[15px] text-gray-800">New Pass</label>
+                  <input type="password" value={formData.newPass} onChange={(e) => setFormData({...formData, newPass: e.target.value})} className="flex-1 border border-gray-300 p-2 outline-none" placeholder="Enter New Password" />
+                </div>
               )}
 
               {modalType === 'S' && (
@@ -301,7 +328,7 @@ export default function AccountList() {
                 </div>
               )}
 
-              {modalType !== 'P' && (
+              {modalType !== 'P' && modalType !== 'S' && (
                 <div className="flex items-center gap-10">
                   <label className="w-24 text-[15px] text-gray-800">Remark</label>
                   <textarea rows="3" value={formData.remark} onChange={(e) => setFormData({...formData, remark: e.target.value})} className="flex-1 border border-gray-300 p-2 outline-none resize-none" />
