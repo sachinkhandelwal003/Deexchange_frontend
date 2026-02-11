@@ -25,6 +25,7 @@ import GeneralLock from './components/Dashboard/Reports/GeneralLock';
 import Registration from "./components/Dashboard/Reports/Registration";
 import Total from './components/Dashboard/Reports/TotalPL';
 import Login from './components/Login';
+import WinlossReport from './components/Dashboard/Reports/WInLossReport';
 import AdminLogin from './components/AdminLogin';
 // --- 1. USER LAYOUT (Main Website Look) ---
 const UserLayout = ({ sidebarOpen, setSidebarOpen }) => (
@@ -91,6 +92,7 @@ export default function App() {
             <Route path="/general-lock" element={<GeneralLock />} />
             <Route path="/registration" element={<Registration />} />
             <Route path="/total-profit-loss" element={<Total />} />
+                <Route path="/win-loss" element={<WinlossReport />} />
         </Route>
       </Routes>
     </Router>

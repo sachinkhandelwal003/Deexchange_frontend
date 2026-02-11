@@ -198,7 +198,7 @@ export default function Navbar() {
     { title: "General Lock", path: "/general-lock" },
     { title: "User Register Detail", path: "/registration" },
     { title: "Total Profit Loss", path: "/total-profit-loss" },
-    { title: "User Win Loss", path: "/user-win-loss" }
+    { title: "User Win Loss", path: "/win-loss" }
   ];
   
   const masterFields = [

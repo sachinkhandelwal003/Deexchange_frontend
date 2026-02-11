@@ -1,6 +1,6 @@
 // src/pages/MultiLoginPage.jsx
-import { useState } from 'react';
-import Navbar from '../Dashboard/Navbar';
+import { useState, useEffect } from 'react';
+import axios from 'axios'; // axios install kar lena agar nahi hai toh
 
 export default function MultiLoginPage() {
   // State for form fields
@@ -10,53 +10,56 @@ export default function MultiLoginPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [transactionCode, setTransactionCode] = useState('');
 
-  // State for checkboxes (Privileges)
-  const [privileges, setPrivileges] = useState({
-    all: false,
-    dashboard: false,
-    marketAnalysis: false,
-    userList: false,
-    insertUser: false,
-    accountStatement: false,
-    partyWinLoss: false,
-    currentBets: false,
-    generalLock: false,
-    casinoResult: false,
-    liveCasinoResult: false,
-    ourCasino: false,
-    events: false,
-    marketSearchAnalysis: false,
-    loginUserCreation: false,
-    withdraw: false,
-    deposit: false,
-    creditReference: false,
-    userInfo: false,
-    userPasswordChange: false,
-    userLock: false,
-    betLock: false,
-    activeUser: false,
-    agentAssign: false,
-    userRegisterReport: false,
-    totalProfitLoss: false,
-    userWinLoss: false,
-  });
+  // API se aane wale data ke liye state
+  const [privilegeData, setPrivilegeData] = useState([]);
+  // Selected IDs ya names ko track karne ke liye
+  const [selectedPrivileges, setSelectedPrivileges] = useState({});
+
+  // Fetch Privileges from API
+  useEffect(() => {
+    const fetchPrivileges = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/admin/get-all-priviliges');
+        if (response.data.success) {
+          setPrivilegeData(response.data.data);
+          
+          // Initial state set karna (sab false)
+          const initialObj = {};
+          response.data.data.forEach(item => {
+            initialObj[item.name] = false;
+          });
+          setSelectedPrivileges(initialObj);
+        }
+      } catch (error) {
+        console.error("Error fetching privileges:", error);
+      }
+    };
+    fetchPrivileges();
+  }, []);
 
   const handlePrivilegeChange = (e) => {
     const { name, checked } = e.target;
-    setPrivileges(prev => ({ ...prev, [name]: checked }));
+    setSelectedPrivileges(prev => ({ ...prev, [name]: checked }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted:', { clientId, fullName, password, confirmPassword, privileges, transactionCode });
-    // Yahan API call ya validation daal dena
+    // Filter out only selected privilege names/IDs
+    const selectedList = Object.keys(selectedPrivileges).filter(key => selectedPrivileges[key]);
+    
+    console.log('Form submitted:', { 
+      clientId, 
+      fullName, 
+      password, 
+      confirmPassword, 
+      selectedPrivileges: selectedList, 
+      transactionCode 
+    });
   };
 
   return (
     <>
-      {/* <Navbar />     */}
-
-      <div className="min-h-screen bg-gray-50  px-4 sm:px-6 pb-12">
+      <div className="min-h-screen bg-gray-50 px-4 sm:px-6 pb-12">
         <div className="max-w-7xl mx-auto bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
           {/* Header */}
           <div className="bg-[#0088CC] text-white px-6 py-4 font-semibold text-xl">
@@ -77,7 +80,6 @@ export default function MultiLoginPage() {
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0088CC]"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                   <input
@@ -87,7 +89,6 @@ export default function MultiLoginPage() {
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0088CC]"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                   <input
@@ -97,7 +98,6 @@ export default function MultiLoginPage() {
                     className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0088CC]"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                   <input
@@ -110,20 +110,20 @@ export default function MultiLoginPage() {
               </div>
             </div>
 
-            {/* Privileges Section */}
+            {/* Privileges Section - Dynamic rendering */}
             <div className="mb-10">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Privileges</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 bg-gray-50 p-4 rounded border border-gray-200">
-                {Object.keys(privileges).map((key) => (
-                  <label key={key} className="flex items-center gap-2 text-sm text-gray-700">
+                {privilegeData.map((item) => (
+                  <label key={item._id} className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="checkbox"
-                      name={key}
-                      checked={privileges[key]}
+                      name={item.name}
+                      checked={selectedPrivileges[item.name] || false}
                       onChange={handlePrivilegeChange}
                       className="h-4 w-4 text-[#0088CC] focus:ring-[#0088CC] border-gray-300 rounded"
                     />
-                    <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                    <span>{item.name}</span>
                   </label>
                 ))}
               </div>
@@ -131,7 +131,6 @@ export default function MultiLoginPage() {
 
             {/* Bottom Action Table + Transaction Code */}
             <div className="border border-gray-200 rounded overflow-hidden mb-6">
-              {/* Scrollable Table Header */}
               <div className="overflow-x-auto bg-gray-100">
                 <table className="min-w-max w-full">
                   <thead>
@@ -139,37 +138,28 @@ export default function MultiLoginPage() {
                       <th className="px-4 py-3 text-left">Action</th>
                       <th className="px-4 py-3 text-left">Username</th>
                       <th className="px-4 py-3 text-left">Full Name</th>
-                      <th className="px-4 py-3 text-center">Dashboard</th>
-                      <th className="px-4 py-3 text-center">Market Analysis</th>
-                      <th className="px-4 py-3 text-center">User List</th>
-                      <th className="px-4 py-3 text-center">Insert User</th>
-                      <th className="px-4 py-3 text-center">Account Statement</th>
-                      <th className="px-4 py-3 text-center">Party Win Loss</th>
-                      <th className="px-4 py-3 text-center">Current Bets</th>
-                      <th className="px-4 py-3 text-center">General Lock</th>
-                      <th className="px-4 py-3 text-center">Casino Result</th>
-                      <th className="px-4 py-3 text-center">Live Casino Result</th>
-                      <th className="px-4 py-3 text-center">Our Casino</th>
-                      {/* ... aur baaki columns */}
+                      {privilegeData.slice(0, 10).map(item => (
+                        <th key={item._id} className="px-4 py-3 text-center">{item.name}</th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Example row – real data ke liye map kar dena */}
-                    <tr className="border-t hover:bg-gray-50">
+                    <tr className="border-t hover:bg-gray-50 text-sm">
                       <td className="px-4 py-3 text-center">
                         <input type="checkbox" className="h-4 w-4 text-[#0088CC]" />
                       </td>
                       <td className="px-4 py-3">demo_user</td>
                       <td className="px-4 py-3">Demo User</td>
-                      <td className="px-4 py-3 text-center"><input type="checkbox" /></td>
-                      <td className="px-4 py-3 text-center"><input type="checkbox" /></td>
-                      {/* ... baaki checkboxes */}
+                      {privilegeData.slice(0, 10).map(item => (
+                        <td key={item._id} className="px-4 py-3 text-center">
+                            <input type="checkbox" checked={selectedPrivileges[item.name] || false} readOnly />
+                        </td>
+                      ))}
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              {/* Bottom Transaction Code + Buttons */}
               <div className="p-4 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50">
                 <div className="flex items-center gap-3">
                   <label className="text-sm font-medium text-gray-700">Transaction Code</label>
@@ -190,6 +180,11 @@ export default function MultiLoginPage() {
                   </button>
                   <button
                     type="button"
+                    onClick={() => {
+                        setSelectedPrivileges({});
+                        setClientId('');
+                        setFullName('');
+                    }}
                     className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-8 py-2.5 rounded font-medium transition"
                   >
                     Reset
