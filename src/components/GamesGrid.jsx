@@ -31,7 +31,7 @@ import d29 from '../assets/img/d29.png'
 // import d30 from '../assets/img/d30.png'  
 //  cvd
 import d31 from '../assets/img/d31.png'
-// import d32 from '../assets/img/d32.png'
+import d32 from '../assets/img/d32.png'
 import d34 from '../assets/img/d34.png'
 import d35 from '../assets/img/d35.png'
 import d36 from '../assets/img/d36.png'
