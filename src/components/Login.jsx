@@ -21,7 +21,7 @@ const LoginPage = () => {
 
     try {
       // 1. Updated payload: Mapping 'username' from form to 'client_name' for API
-      const response = await axios.post('http://localhost:3000/api/users/user-login', {
+      const response = await axios.post('https://devexchangee.in/api/api/users/user-login', {
         client_name: formData.username, 
         password: formData.password
       });

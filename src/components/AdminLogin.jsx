@@ -21,7 +21,7 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:3000/api/users/admin-login', {
+      const response = await axios.post('https://devexchangee.in/api/api/users/admin-login', {
         username: formData.username,
         password: formData.password
       });

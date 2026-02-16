@@ -69,7 +69,7 @@ export default function AddAccountPage() {
         partnership_our: Number(formData.partOur),
         transaction_password: formData.transactionPassword
       };
-      const response = await axios.post('http://localhost:3000/api/users/create-user', payload, {
+      const response = await axios.post('https://devexchangee.in/api/api/users/create-user', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) alert("Account Created Successfully!");

@@ -16,7 +16,7 @@ const ProfitLossReport = () => {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:3000/api/admin/get-profit-loss-reports`, {
+      const response = await axios.get(`https://devexchangee.in/api/api/admin/get-profit-loss-reports`, {
         params: {
           page: page,
           limit: limit,

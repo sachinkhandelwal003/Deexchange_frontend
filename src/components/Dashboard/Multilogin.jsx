@@ -19,7 +19,7 @@ export default function MultiLoginPage() {
   useEffect(() => {
     const fetchPrivileges = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/admin/get-all-priviliges');
+        const response = await axios.get('https://devexchangee.in/api/api/admin/get-all-priviliges');
         if (response.data.success) {
           setPrivilegeData(response.data.data);
           

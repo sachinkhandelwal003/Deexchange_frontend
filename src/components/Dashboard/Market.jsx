@@ -10,7 +10,7 @@ export default function MarketAnalysisPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/admin/match-analysis', {
+      const response = await axios.get('https://devexchangee.in/api/api/admin/match-analysis', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {

@@ -38,7 +38,7 @@ export default function AccountList() {
   const fetchAdminProfile = async () => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/users/get-profile', {
+      const response = await axios.get('https://devexchangee.in/api/api/users/get-profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) setAdminProfile(response.data.data);
@@ -49,7 +49,7 @@ export default function AccountList() {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const url = `http://localhost:3000/api/users/get-all-users?page=${currentPage}&limit=${entriesPerPage}&search=${searchTerm}`;
+      const url = `https://devexchangee.in/api/api/users/get-all-users?page=${currentPage}&limit=${entriesPerPage}&search=${searchTerm}`;
       const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
         setAccounts(response.data.data);
@@ -62,7 +62,7 @@ export default function AccountList() {
   const handleDownloadPDF = async () => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/admin/download-account-list-pdf', {
+      const response = await axios.get('https://devexchangee.in/api/api/admin/download-account-list-pdf', {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob',
       });
@@ -80,7 +80,7 @@ export default function AccountList() {
   const handleDownloadExcel = async () => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3000/api/admin/download-account-list-excel', {
+      const response = await axios.get('https://devexchangee.in/api/api/admin/download-account-list-excel', {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob', // Important for file data
       });
@@ -97,7 +97,7 @@ export default function AccountList() {
   const fetchBalanceData = async (userId) => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/admin/get-admin-user-balance?user_id=${userId}`, {
+      const response = await axios.get(`https://devexchangee.in/api/api/admin/get-admin-user-balance?user_id=${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.status === "success") setApiBalances(response.data.data);
@@ -107,7 +107,7 @@ export default function AccountList() {
   const fetchExposureLimit = async (userId) => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/admin/get-user-exposure-limit?user_id=${userId}`, {
+      const response = await axios.get(`https://devexchangee.in/api/api/admin/get-user-exposure-limit?user_id=${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.status === "success") setExposureData({ exposure_limit: response.data.data.exposure_limit });
@@ -117,7 +117,7 @@ export default function AccountList() {
   const fetchUserStatus = async (userId) => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/admin/get-user-statuses?user_id=${userId}`, {
+      const response = await axios.get(`https://devexchangee.in/api/api/admin/get-user-statuses?user_id=${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.status === "success") {
@@ -151,7 +151,7 @@ export default function AccountList() {
       let payload = { user_id: selectedAccount._id };
 
       if (modalType === 'D' || modalType === 'W') {
-        url = modalType === 'D' ? 'http://localhost:3000/api/admin/make-deposit-transaction' : 'http://localhost:3000/api/admin/make-withdraw-transaction';
+        url = modalType === 'D' ? 'https://devexchangee.in/api/api/admin/make-deposit-transaction' : 'https://devexchangee.in/api/api/admin/make-withdraw-transaction';
         payload.amount_to_send = inputAmt;
         payload.remark = formData.remark;
         payload.transaction_password = formData.password;
@@ -161,24 +161,24 @@ export default function AccountList() {
         payload.users_final_amount = userFinal;
       } 
       else if (modalType === 'L') {
-        url = 'http://localhost:3000/api/admin/set-exposure-limit';
+        url = 'https://devexchangee.in/api/api/admin/set-exposure-limit';
         payload.transaction_password = formData.password;
         payload.old_exposure_limit = Number(exposureData.exposure_limit);
         payload.new_exposure_limit = Number(formData.newLimit);
       }
       else if (modalType === 'C') {
-        url = 'http://localhost:3000/api/admin/update-credit-reference';
+        url = 'https://devexchangee.in/api/api/admin/update-credit-reference';
         payload.transaction_password = formData.password;
         payload.old_credit = Number(selectedAccount.credit_ref || 0);
         payload.new_credit = Number(formData.newCredit);
       }
       else if (modalType === 'P') {
-        url = 'http://localhost:3000/api/admin/change-users-password';
+        url = 'https://devexchangee.in/api/api/admin/change-users-password';
         payload.transaction_password = formData.password;
         payload.new_password = formData.newPass;
       }
       else if (modalType === 'S') {
-        url = 'http://localhost:3000/api/admin/change-user-status';
+        url = 'https://devexchangee.in/api/api/admin/change-user-status';
         payload.is_active = formData.userActive;
         payload.can_bet = formData.betActive;
         payload.transaction_password = formData.password;
