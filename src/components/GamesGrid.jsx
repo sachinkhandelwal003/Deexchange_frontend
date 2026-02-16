@@ -31,7 +31,7 @@ import d29 from '../assets/img/d29.png'
 // import d30 from '../assets/img/d30.png'  
 //  cvd
 import d31 from '../assets/img/d31.png'
-import d32 from '../assets/img/d32.png'
+// import d32 from '../assets/img/d32.png'
 import d34 from '../assets/img/d34.png'
 import d35 from '../assets/img/d35.png'
 import d36 from '../assets/img/d36.png'
@@ -82,7 +82,7 @@ export default function GamesGrid() {
     { src: d34, name: " TEENPATTI 3.0" },
 
     // { src: d28, name: "VIP TEENPATTI" },{ src: d29, name: "VIP TEENPATTI" },
-    { src: d32, name: "BALL BY BALL" },
+    // { src: d32, name: "BALL BY BALL" },
     { src: d35, name: " TEENPATTI 1 DAY" },
     { src: d36, name: " TEENPATTI 20 20 " },
   { src: d37, name: "TEENPATTI TEST" },
