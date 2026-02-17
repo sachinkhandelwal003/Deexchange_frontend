@@ -6,7 +6,7 @@ const useEntitySocket = (onMessage) => {
 
   useEffect(() => {
     // Use the correct WebSocket URL - your backend server
-    const wsUrl = `ws://${window.location.hostname}:3000`; // Make sure this matches your backend port
+const wsUrl = `wss://${window.location.hostname}/ws`;
     console.log("🔄 Connecting to WebSocket:", wsUrl);
     
     const ws = new WebSocket(wsUrl);
