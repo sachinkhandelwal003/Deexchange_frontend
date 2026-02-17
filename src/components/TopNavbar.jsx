@@ -13,7 +13,7 @@ export default function TopNavbar({ onMenuClick }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+        const token = localStorage.getItem("userToken") || localStorage.getItem("token");
         if (!token) return;
 
         const response = await axios.get("https://devexchangee.in/api/api/users/get-profile", {

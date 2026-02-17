@@ -27,6 +27,7 @@ import Total from './components/Dashboard/Reports/TotalPL';
 import Login from './components/Login';
 import WinlossReport from './components/Dashboard/Reports/WInLossReport';
 import AdminLogin from './components/AdminLogin';
+import ProtectedRoute from './components/ProtectedRoute';
 // --- 1. USER LAYOUT (Main Website Look) ---
 const UserLayout = ({ sidebarOpen, setSidebarOpen }) => (
   <div className="min-h-screen bg-white">
@@ -61,7 +62,17 @@ export default function App() {
     <Router>
       <Routes>
         {/* --- CLIENT ROUTES --- */}
-        <Route element={<UserLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}>
+<Route
+  element={
+    <ProtectedRoute type="user">
+      <UserLayout
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
+    </ProtectedRoute>
+  }
+>
+     
           <Route path="/" element={<MainContent />} />
           <Route path="/game/:id" element={<GameDetail />} />
           <Route path="/account-statement" element={<AccountStatement />} />
@@ -73,8 +84,16 @@ export default function App() {
           <Route path="/user/login" element={<Login />} />
           <Route path="/admin-login" element={<AdminLogin />} />
         </Route>
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<Dashboard />} />
+<Route
+  element={
+    <ProtectedRoute type="admin">
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
+   
+
+       <Route path="/admin" element={<Dashboard />} />
           <Route path="/add-account" element={<AddAccountPage />} />
           <Route path="/assign-agent" element={<AssignAgentPage />} />
           <Route path="/market-analysis" element={<MarketAnalysisPage />} />
