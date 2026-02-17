@@ -47,98 +47,106 @@ export default function MainContent() {
     }
   }, [activeSport]);
 
-  // 🔥 WebSocket Live Updates
-  useEntitySocket((data) => {
-    console.log("🔥 Updating state with:", data);
+// 🔥 WebSocket Live Updates
+useEntitySocket((data) => {
+  if (!data || !data.api_type) return;
 
-    // Handle different types of WebSocket data
-    if (data.api_type === "match_push_obj" && data.response?.match_id) {
-      const matchId = data.response.match_id;
-      const matchInfo = data.response.match_info;
-      
-      setMatches((prev) =>
-        prev.map((match) => {
-          if (match.match_id === matchId) {
-            // Update match with live data
-            return {
-              ...match,
-              // Update match info
-              title: matchInfo.title || match.title,
-              status_str: matchInfo.status_str,
-              status_note: matchInfo.status_note,
-              // Update team scores if available
-              teama: {
-                ...match.teama,
-                scores_full: matchInfo.teama?.scores_full || match.teama?.scores_full
-              },
-              teamb: {
-                ...match.teamb,
-                scores_full: matchInfo.teamb?.scores_full || match.teamb?.scores_full
-              },
-              // Keep existing data
-              live_odds: data.response.live_odds || match.live_odds
-            };
-          }
-          return match;
-        })
-      );
-    }
-    
-    // Handle odds updates specifically
+  // 🟢 MATCH LIVE SCORE UPDATE
+  if (data.api_type === "match_push_obj" && data.response?.match_id) {
+    const matchId = data.response.match_id;
+    const matchInfo = data.response.match_info;
+
+    setMatches((prev) => {
+      const exists = prev.find((m) => m.match_id === matchId);
+
+      if (exists) {
+        return prev.map((match) =>
+          match.match_id === matchId
+            ? {
+                ...match,
+                ...matchInfo, // merge full match info
+                teama: {
+                  ...match.teama,
+                  ...matchInfo.teama,
+                },
+                teamb: {
+                  ...match.teamb,
+                  ...matchInfo.teamb,
+                },
+              }
+            : match
+        );
+      } else {
+        // If match not exist → add new
+        return [...prev, matchInfo];
+      }
+    });
+  }
+
+  // 🟢 ODDS UPDATE
   if (data.api_type === "odds_update" && data.response?.match_id) {
-  const matchId = data.response.match_id;
+    const matchId = data.response.match_id;
 
-  const market = data.response.market?.[0];
-  if (!market) return;
+    const market = data.response.market?.[0];
+    if (!market) return;
 
-  const runner1 = market.runners?.[0];
-  const runner2 = market.runners?.[1];
+    const runner1 = market.runners?.[0];
+    const runner2 = market.runners?.[1];
 
-  const formattedOdds = {
-    back1: runner1?.back?.[0]?.price,
-    lay1: runner1?.lay?.[0]?.price,
-    back2: runner2?.back?.[0]?.price,
-    lay2: runner2?.lay?.[0]?.price
-  };
+    const formattedOdds = {
+      back1: runner1?.back?.[0]?.price || "-",
+      lay1: runner1?.lay?.[0]?.price || "-",
+      back2: runner2?.back?.[0]?.price || "-",
+      lay2: runner2?.lay?.[0]?.price || "-",
+    };
 
-  setMatches((prev) =>
-    prev.map((match) =>
-      match.match_id === matchId
-        ? { ...match, live_odds: formattedOdds }
-        : match
-    )
-  );
-}
+    setMatches((prev) =>
+      prev.map((match) =>
+        match.match_id === matchId
+          ? { ...match, live_odds: formattedOdds }
+          : match
+      )
+    );
+  }
+});
 
-  });
 
   // 🔥 Format Data for Table
-  const formattedData = matches.map((match) => {
-    // Get team names for title if needed
-    const teamAName = match.teama?.name || "";
-    const teamBName = match.teamb?.name || "";
-    const displayTitle = match.title || `${teamAName} vs ${teamBName}`;
-    
-    // Get scores if available
-    const scores = match.teama?.scores_full && match.teamb?.scores_full 
-      ? `${match.teama.scores_full} - ${match.teamb.scores_full}`
+const formattedData = matches.map((match) => {
+  const teamAName = match.teama?.name || "";
+  const teamBName = match.teamb?.name || "";
+
+  const displayTitle =
+    match.title || `${teamAName} vs ${teamBName}`;
+
+  const scores =
+    match.teama?.scores_full || match.teamb?.scores_full
+      ? `${match.teama?.scores_full || ""} ${
+          match.teamb?.scores_full || ""
+        }`
       : "";
 
-    return {
-      id: match.match_id,
-      title: displayTitle,
-      date: match.date_start_ist,
-      scores: scores,
-      status: match.status_str || match.status_note || "",
-      // Odds data - you'll need to map these based on your API structure
-      back1: match.live_odds?.back1 || "-",
-      lay1: match.live_odds?.lay1 || "-",
-      backX: match.live_odds?.backX || "-",
-      layX: match.live_odds?.layX || "-",
-      back2: match.live_odds?.back2 || "-",
-      lay2: match.live_odds?.lay2 || "-",
-    };
-  });
+  const isLive =
+    match.status_str === "Live" ||
+    match.status === "Live";
+
+  return {
+    id: match.match_id || match.id,
+    title: displayTitle,
+    date: match.date_start_ist || match.date,
+    scores,
+    status: match.status_str || match.status || "",
+    isLive,
+    back1: match.live_odds?.back1 ?? "-",
+    lay1: match.live_odds?.lay1 ?? "-",
+    backX: "-",
+    layX: "-",
+    back2: match.live_odds?.back2 ?? "-",
+    lay2: match.live_odds?.lay2 ?? "-",
+  };
+});
+
+
 
   return (
     <div className="flex-1 bg-white rounded-xl shadow-lg">

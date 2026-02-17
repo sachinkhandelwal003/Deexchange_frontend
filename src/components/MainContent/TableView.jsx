@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 export default function TableView({ data, loading }) {
+  console.log("live data table view ",data)
   const navigate = useNavigate();
 
   if (loading) {
@@ -39,14 +40,20 @@ export default function TableView({ data, loading }) {
               onClick={() => navigate(`/game/${row.id}`)}
             >
               <td className="px-2 py-1 text-gray-800 whitespace-nowrap">
-                <div className="font-medium text-blue-700 hover:underline">
-                  {row.title}
-                </div>
+                <div className="flex items-center">
+                <div className="flex items-center gap-2 font-medium text-blue-700 hover:underline">
+  {row.isLive && (
+    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+  )}
+  {row.title}/
+</div>
+
                 <div className="text-[11px] text-gray-500">
                   {row.date}
                 </div>
+</div>
                 {/* Show live scores/status if available */}
-                {row.scores && (
+                {/* {row.scores && (
                   <div className="text-[10px] font-semibold text-green-600">
                     {row.scores}
                   </div>
@@ -55,7 +62,7 @@ export default function TableView({ data, loading }) {
                   <div className="text-[10px] text-orange-500">
                     {row.status}
                   </div>
-                )}
+                )} */}
               </td>
 
               <td className="w-20 text-center bg-[#7ec3f5] font-bold border-l border-white">
