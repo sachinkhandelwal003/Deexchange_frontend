@@ -26,6 +26,7 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 🔹 Normal Login
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -41,26 +42,7 @@ const LoginPage = () => {
       );
 
       if (response.data.success) {
-        const token = response.data.token;
-        const role = response.data.data.account_type; // admin or user
-        const fullName = response.data.data.full_name;
-
-        // 🔹 Clear old tokens
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("userToken");
-
-        if (role === "admin") {
-          localStorage.setItem("adminToken", token);
-          navigate("/admin");
-        } else {
-          localStorage.setItem("userToken", token);
-          navigate("/");
-        }
-
-        localStorage.setItem("userRole", role);
-        localStorage.setItem("userName", fullName);
-
-        alert("Login Successful!");
+        processLogin(response.data);
       }
     } catch (err) {
       const message =
@@ -70,6 +52,53 @@ const LoginPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 🔹 Demo Login
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post(
+        "https://devexchangee.in/api/api/users/demo-login",
+        {
+          client_name: "Demo1",
+          password: "Password@123",
+        }
+      );
+
+      if (response.data.success) {
+        processLogin(response.data);
+      }
+    } catch (err) {
+      setError("Demo login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔹 Common Login Processor
+  const processLogin = (data) => {
+    const token = data.token;
+    const role = data.data.account_type;
+    const fullName = data.data.full_name;
+
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("userToken");
+
+    if (role === "admin") {
+      localStorage.setItem("adminToken", token);
+      navigate("/admin");
+    } else {
+      localStorage.setItem("userToken", token);
+      navigate("/");
+    }
+
+    localStorage.setItem("userRole", role);
+    localStorage.setItem("userName", fullName);
+
+    alert("Login Successful!");
   };
 
   return (
@@ -93,37 +122,63 @@ const LoginPage = () => {
           </div>
         )}
 
-        <form className="space-y-4" onSubmit={handleLogin}>
-          <input
-            type="text"
-            name="username"
-            required
-            value={formData.username}
-            onChange={handleChange}
-            placeholder="Client Name / Username"
-            className="w-full border border-gray-300 px-4 py-3 rounded text-sm outline-none"
-          />
+      <form className="space-y-4" onSubmit={handleLogin}>
+  {/* Username */}
+  <div className="relative">
+    <input
+      type="text"
+      name="username"
+      required
+      value={formData.username}
+      onChange={handleChange}
+      placeholder="Username"
+      className="w-full border border-gray-300 px-4 py-3 rounded text-sm outline-none"
+    />
+    <span className="absolute right-3 top-3 text-gray-500">
+      <i className="fas fa-user"></i>
+    </span>
+  </div>
 
-          <input
-            type="password"
-            name="password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Password"
-            className="w-full border border-gray-300 px-4 py-3 rounded text-sm outline-none"
-          />
+  {/* Password */}
+  <div className="relative">
+    <input
+      type="password"
+      name="password"
+      required
+      value={formData.password}
+      onChange={handleChange}
+      placeholder="Password"
+      className="w-full border border-gray-300 px-4 py-3 rounded text-sm outline-none"
+    />
+    <span className="absolute right-3 top-3 text-gray-500">
+      <i className="fas fa-key"></i>
+    </span>
+  </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full bg-[#0288d1] hover:bg-[#0277bd] text-white font-bold py-3 rounded uppercase text-sm ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
-            {loading ? "Authenticating..." : "Login"}
-          </button>
-        </form>
+  {/* Login Button */}
+  <button
+    type="submit"
+    disabled={loading}
+    className="w-full bg-[#0288d1] hover:bg-[#0277bd] text-white font-semibold py-3 rounded flex justify-center items-center gap-2"
+  >
+    {loading ? "Authenticating..." : "Login"}
+    <span>➜</span>
+  </button>
+
+  {/* Demo Login Button */}
+  <button
+    type="button"
+    onClick={handleDemoLogin}
+    disabled={loading}
+    className="w-full bg-[#0288d1] hover:bg-[#0277bd] text-white font-semibold py-3 rounded flex justify-center items-center gap-2"
+  >
+    {loading ? "Authenticating..." : "Login with demo ID"}
+    <span>➜</span>
+  </button>
+</form>
+
+
+       
       </div>
     </div>
   );
