@@ -10,6 +10,7 @@ export default function AccountList() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalEntries, setTotalEntries] = useState(0);
+const [deleteUserData, setDeleteUserData] = useState(null);
 
   // --- States ---
   const [modalType, setModalType] = useState(null); 
@@ -26,6 +27,55 @@ export default function AccountList() {
     newLimit: '', newCredit: '', newPass: '', confirmPass: '',
     userActive: true, betActive: true
   });
+
+const handleToggleUser = async (userId, currentStatus) => {
+  try {
+    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+    const response = await axios.put(
+      `https://devexchangee.in/api/api/users/toggle/${userId}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.data.success) {
+      // Update the accounts array locally
+      setAccounts(prev =>
+        prev.map(acc =>
+          acc._id === userId
+            ? { ...acc, is_active: response.data.data.is_active, can_bet: response.data.data.can_bet }
+            : acc
+        )
+      );
+      alert(response.data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Toggle failed");
+  }
+};
+
+
+const confirmDeleteUser = async () => {
+  try {
+    const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+
+    const response = await axios.delete(
+      `https://devexchangee.in/api/api/users/delete-user/${deleteUserData._id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+
+    if (response.data.success) {
+      alert("User deleted successfully");
+      setDeleteUserData(null);
+      fetchUsers();
+    }
+  } catch (err) {
+    alert(err.response?.data?.message || "Delete failed");
+  }
+};
+
 
   // Real-time Search
   useEffect(() => {
@@ -258,6 +308,21 @@ export default function AccountList() {
                             {['D', 'W', 'L', 'C', 'P', 'S'].map(btn => (
                               <button key={btn} onClick={() => openModal(btn, acc)} className="w-8 h-7 bg-[#111] text-white rounded-[3px] text-[12px] font-black uppercase shadow-md">{btn}</button>
                             ))}
+                  <div className="flex gap-1.5 items-center">
+    <button
+      onClick={() => handleToggleUser(acc._id, acc.is_active)}
+      className={`w-16 h-7 rounded-full relative transition-colors ${
+        acc.is_active ? 'bg-[#0088CC]' : 'bg-gray-400'
+      }`}
+    >
+      <div
+        className={`absolute top-1 bg-[#333] w-5 h-5 rounded-full transition-transform ${
+          acc.is_active ? 'translate-x-9' : 'translate-x-1'
+        }`}
+      ></div>
+    </button>
+  </div>
+
                         </div>
                     </td>
                 </tr>
@@ -366,6 +431,39 @@ export default function AccountList() {
           </div>
         </div>
       )}
+
+{deleteUserData && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+      <h2 className="text-lg font-bold text-red-600 mb-4">
+        Confirm Delete
+      </h2>
+
+      <p className="text-gray-700 mb-6">
+        Are you sure you want to delete user 
+        <span className="font-bold text-black"> {deleteUserData.client_name}</span>?
+      </p>
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setDeleteUserData(null)}
+          className="bg-gray-500 text-white px-4 py-2 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={confirmDeleteUser}
+          className="bg-red-600 text-white px-4 py-2 rounded"
+        >
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }
