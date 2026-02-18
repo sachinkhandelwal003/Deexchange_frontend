@@ -1,3 +1,4 @@
+// hooks/SocketProvider.jsx
 import { createContext, useEffect, useRef, useState } from "react";
 
 export const SocketContext = createContext();
@@ -8,8 +9,9 @@ export default function SocketProvider({ children }) {
 
   // Function to initialize WebSocket
   const initWebSocket = () => {
+    // ✅ FIXED: Remove :3000 from URL
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsUrl = `${protocol}://${window.location.hostname}:3000/ws`;
+    const wsUrl = `${protocol}://${window.location.hostname}/ws`; // REMOVED :3000
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 
@@ -79,7 +81,7 @@ export default function SocketProvider({ children }) {
 
     socket.onclose = () => {
       console.log("🔴 WebSocket Closed. Reconnecting in 3s...");
-      setTimeout(initWebSocket, 3000); // auto-reconnect
+      setTimeout(initWebSocket, 1000);
     };
 
     socket.onerror = (err) => {
@@ -91,7 +93,6 @@ export default function SocketProvider({ children }) {
   useEffect(() => {
     initWebSocket();
 
-    // Cleanup on unmount
     return () => {
       socketRef.current?.close();
       console.log("🧹 WebSocket Cleanup Done");
