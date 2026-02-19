@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import myLogo from "../../src/assets/image/dev_logo.png";
+import { useAuth } from "../components/context/UserContext";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+const { fetchProfile } = useAuth();
 
   const navigate = useNavigate();
 
@@ -79,27 +81,30 @@ const LoginPage = () => {
   };
 
   // 🔹 Common Login Processor
-  const processLogin = (data) => {
-    const token = data.token;
-    const role = data.data.account_type;
-    const fullName = data.data.full_name;
+const processLogin = async (data) => {
+  const token = data.token;
+  const role = data.data.account_type;
 
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("userToken");
+  localStorage.removeItem("adminToken");
+  localStorage.removeItem("userToken");
 
-    if (role === "admin") {
-      localStorage.setItem("adminToken", token);
-      navigate("/admin");
-    } else {
-      localStorage.setItem("userToken", token);
-      navigate("/");
-    }
+  if (role === "admin") {
+    localStorage.setItem("adminToken", token);
+    navigate("/admin");
+  } else {
+    localStorage.setItem("userToken", token);
 
-    localStorage.setItem("userRole", role);
-    localStorage.setItem("userName", fullName);
+    // ✅ Fetch Profile After Login
+    await fetchProfile(token);
 
-    alert("Login Successful!");
-  };
+    navigate("/");
+  }
+
+  localStorage.setItem("userRole", role);
+
+  alert("Login Successful!");
+};
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0288d1] to-[#01579b] font-sans p-4">

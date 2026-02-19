@@ -43,40 +43,31 @@ export default function MainContent() {
 
   // 🔥 Format Data (optimized)
   const formattedData = useMemo(() => {
-    return matches.map((match) => {
-      const teamAName = match.teama?.name || "";
-      const teamBName = match.teamb?.name || "";
+  return matches.map((match) => {
+    const matchInfo = match.match_info || {};
+    const odds = match.live_odds?.matchodds || {};
 
-      const displayTitle =
-        match.title || `${teamAName} vs ${teamBName}`;
+    return {
+      id: matchInfo.match_id,   // ✅ correct id
+      title:
+        matchInfo.title ||
+        `${matchInfo.teama?.name || ""} vs ${matchInfo.teamb?.name || ""}`,
 
-      const scores =
-        match.teama?.scores_full || match.teamb?.scores_full
-          ? `${match.teama?.scores_full || ""} ${
-              match.teamb?.scores_full || ""
-            }`
-          : "";
+      date: matchInfo.date_start_ist || "",
+      status: matchInfo.status_str || "",
+      isLive: matchInfo.status_str === "Live",
 
-      const isLive =
-        match.status_str === "Live" ||
-        match.status === "Live";
+      back1: odds.teama?.back || "-",
+      lay1: odds.teama?.lay || "-",
 
-      return {
-        id: match.match_id || match.id,
-        title: displayTitle,
-        date: match.date_start_ist || match.date,
-        scores,
-        status: match.status_str || match.status || "",
-        isLive,
-        back1: match.live_odds?.back1 ?? "-",
-        lay1: match.live_odds?.lay1 ?? "-",
-        backX: "-",
-        layX: "-",
-        back2: match.live_odds?.back2 ?? "-",
-        lay2: match.live_odds?.lay2 ?? "-",
-      };
-    });
-  }, [matches]);
+      backX: "-",
+      layX: "-",
+
+      back2: odds.teamb?.back || "-",
+      lay2: odds.teamb?.lay || "-",
+    };
+  });
+}, [matches]);
 
   return (
     <div className="flex-1 bg-white rounded-xl shadow-lg">

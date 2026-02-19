@@ -90,7 +90,7 @@ export default function TableView({ data = [], loading }) {
         <tbody>
           {data.map((row) => (
             <MemoRow
-              key={row.id}
+key={row.id || Math.random()}
               row={row}
               onClick={() => navigate(`/game/${row.id}`)}
             />

@@ -7,6 +7,7 @@ export default function TopNavbar({ onMenuClick }) {
   const [open, setOpen] = useState(false);
   const [userName, setUserName] = useState("Loading..."); // Default state
     const [creditRef, setCreditRef] = useState("Loading..."); // Default state
+    const [balancecreditRef, balancesetCreditRef] = useState("Loading..."); // Default state
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ export default function TopNavbar({ onMenuClick }) {
           // Aapki API ke data structure ke hisaab se client_name ya full_name nikalein
           const name = response.data.data.client_name || response.data.data.full_name || "User";
           const credit=response.data.data.credit_ref
+                    const currentbalance=response.data.data.current_balance
+balancesetCreditRef(currentbalance)
           setCreditRef(credit)
           setUserName(name);
         }
@@ -67,7 +70,9 @@ const handleSignOut = () => {
 
           <div className="hidden lg:flex items-center gap-6 text-sm">
             <div className="text-right leading-tight">
-              <div>Balance: <strong>{creditRef}</strong></div>
+              <div>Credits: <strong>{creditRef}</strong></div>
+                            <div>Balance: <strong>{balancecreditRef}</strong></div>
+
               {/* <div className="text-xs opacity-90">Exp: 0</div> */}
             </div>
 
