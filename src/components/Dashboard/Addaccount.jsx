@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import { useAuth } from "../context/UserContext";
 // Professional SVG Icons (No more monkeys 🙈)
 const EyeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -19,7 +19,7 @@ export default function AddAccountPage() {
   const [showPwd, setShowPwd] = useState(false);
   const [showRetypePwd, setShowRetypePwd] = useState(false);
   const [showTxnPwd, setShowTxnPwd] = useState(false);
-
+const { user } = useAuth();
   const [formData, setFormData] = useState({
     clientName: '',
     userPassword: '',
@@ -67,7 +67,9 @@ export default function AddAccountPage() {
         partnership_upline: Number(formData.partUpline),
         partnership_downline: Number(formData.partDownline),
         partnership_our: Number(formData.partOur),
-        transaction_password: formData.transactionPassword
+        transaction_password: formData.transactionPassword,
+          created_by_id: user?._id
+
       };
       const response = await axios.post('https://devexchangee.in/api/api/users/create-user', payload, {
         headers: { Authorization: `Bearer ${token}` }
@@ -138,8 +140,9 @@ export default function AddAccountPage() {
                 <div>
                   <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Account Type</label>
                   <select name="accountType" value={formData.accountType} onChange={handleChange} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm bg-white font-medium">
-                    <option value="agent">Agent</option>
-                    <option value="user">User</option>
+{user?.account_type === "admin" && (
+    <option value="agent">Agent</option>
+  )}                    <option value="user">User</option>
                   </select>
                 </div>
                 <div>

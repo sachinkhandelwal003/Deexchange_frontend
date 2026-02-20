@@ -88,18 +88,16 @@ const processLogin = async (data) => {
   localStorage.removeItem("adminToken");
   localStorage.removeItem("userToken");
 
-  if (role === "admin") {
-    localStorage.setItem("adminToken", token);
-    navigate("/admin");
-  } else {
-    localStorage.setItem("userToken", token);
-
-    // ✅ Fetch Profile After Login
-    await fetchProfile(token);
-
-    navigate("/");
+  // 🚫 Block agent/admin from user login
+  if (role === "admin" || role === "agent" || role === "admin_staff") {
+    setError("Please login from Admin Panel.");
+    return;
   }
 
+  // ✅ Normal user login
+  localStorage.setItem("userToken", token);
+  await fetchProfile(token);
+  navigate("/");
   localStorage.setItem("userRole", role);
 
   alert("Login Successful!");

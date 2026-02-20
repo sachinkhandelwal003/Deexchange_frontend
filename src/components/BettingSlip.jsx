@@ -13,6 +13,10 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
 
+  console.log("matchDatamatchDatamatchData" ,matchData)
+    console.log("selectedOddsselectedOddsselectedOdds" ,selectedOdds)
+  // console.log("matchDatamatchDatamatchData" ,matchData)
+
   // Calculate profit/liability when odds or stake changes
   useEffect(() => {
     if (!odds || !stake || stake <= 0) {
@@ -79,6 +83,7 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
     // Fallback: create unique ID from name
     return `${selectedOdds?.market}_${selectedOdds?.team?.name || selectedOdds?.title}`.replace(/\s+/g, '_').toLowerCase();
   };
+
 
   // Generate selection name dynamically
   const getSelectionName = () => {

@@ -92,12 +92,13 @@ const handleSignOut = () => {
                     <li className="hover:bg-gray-100 border-b bg-gray-50 px-4 py-2 font-bold text-[#2C3E50]">
                       Hi, {userName}
                     </li>
-                    <li className="hover:bg-gray-100">
+                    {/* <li className="hover:bg-gray-100">
                       <Link to="/account-statement" className="block px-4 py-2" onClick={() => setOpen(false)}>
                         Account Statement
                       </Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Current Bet</li>
+                    </li> */}
+                    <li className=" hover:bg-gray-100 cursor-pointer">  <Link to="/bets/my" className="block px-4 py-2" onClick={() => setOpen(false)}>
+Unsettled Bets                      </Link></li>
                     <li className="hover:bg-gray-100">
                       <Link to="/casino-results" className="block px-4 py-2" onClick={() => setOpen(false)}>
                         Casino Results

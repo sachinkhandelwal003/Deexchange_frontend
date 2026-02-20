@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-const CurrentBets = () => {
+const UserOwnBets = () => {
   const [activeTab, setActiveTab] = useState('Sports');
   const [betsData, setBetsData] = useState([]); // API data store karne ke liye
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ const CurrentBets = () => {
 const navigate = useNavigate();
   // Get token from localStorage
   const getToken = () => {
-    return localStorage.getItem('adminToken') || ''; // Adjust this based on your token key name
+    return localStorage.getItem('userToken') || ''; // Adjust this based on your token key name
   };
 
   // API Fetch Function
@@ -319,14 +319,14 @@ const navigate = useNavigate();
                     <td className="p-2 text-[13px] text-center">
                       {formatDate(bet.placed_at)}
                     </td>
-                     <td className="p-2 text-[13px] text-center">
+                     {/* <td className="p-2 text-[13px] text-center">
   <button
     onClick={() => navigate(`/current-bets/${bet._id}`)}
     className="text-blue-600 underline"
   >
     View
   </button>
-</td>
+</td> */}
                   </tr>
                 ))
               ) : (
@@ -395,4 +395,4 @@ const navigate = useNavigate();
   );
 };
 
-export default CurrentBets;
+export default UserOwnBets;

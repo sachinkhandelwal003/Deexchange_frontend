@@ -289,6 +289,8 @@ const confirmDeleteUser = async () => {
                 <th className="px-4 py-3 border-r text-right">Credit Reference</th>
                 <th className="px-2 py-3 border-r text-center">U st</th>
                 <th className="px-2 py-3 border-r text-center">B st</th>
+                                <th className="px-2 py-3 border-r text-center">Account Type</th>
+
                 <th className="px-4 py-3 border-r text-center">Exposure</th>
                 <th className="px-4 py-3 border-r text-center">Default (%)</th>
                 <th className="px-4 py-3">Action</th>
@@ -301,6 +303,17 @@ const confirmDeleteUser = async () => {
                   <td className="px-4 py-2 border-r text-right font-black">{(acc.credit_ref || 0).toLocaleString()}</td>
                   <td className="px-2 py-2 border-r text-center"><div className="w-6 h-6 bg-black flex items-center justify-center rounded-[3px] mx-auto border border-gray-700"><span className={acc.is_active ? "text-[#00FF00] text-[14px] font-black" : "text-red-600 text-[14px] font-black"}>{acc.is_active ? '✔' : '✘'}</span></div></td>
                   <td className="px-2 py-2 border-r text-center"><div className="w-6 h-6 bg-black flex items-center justify-center rounded-[3px] mx-auto border border-gray-700"><span className={acc.can_bet ? "text-[#00FF00] text-[14px] font-black" : "text-red-600 text-[14px] font-black"}>{acc.can_bet ? '✔' : '✘'}</span></div></td>
+<td className="px-2 py-2 border-r text-center">
+  <span
+    className={
+      acc.account_type
+        ? "text-[14px] font-bold"
+        : "text-[14px] font-bold"
+    }
+  >
+    {acc.account_type}
+  </span>
+</td>
                   <td className="px-4 py-2 border-r text-center font-bold">{acc.exposure_limit || 0}</td>
                   <td className="px-4 py-2 border-r text-center font-bold">{acc.defaultPercent || 0}</td>
                   <td className="px-4 py-2 whitespace-nowrap">

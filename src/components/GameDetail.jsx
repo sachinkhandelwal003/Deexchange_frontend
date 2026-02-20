@@ -170,25 +170,30 @@ useEffect(() => {
   }, [initialData, liveMatch]);
 
   // Handle odds click
-  const handleOddsClick = (team, oddsType, oddsValue, market, backVolume, layVolume) => {
-    if (!user) {
-      alert("Please login to place bet");
-      return;
-    }
-    
-    setSelectedOdds({
-      team,
-      back: team?.back,
-      lay: team?.lay,
-      back_volume: backVolume,
-      lay_volume: layVolume,
-      oddsType,
-      odds: oddsValue,
-      market,
-      selection_id: team?.team_id,
-    });
-    setShowBetSlip(true);
-  };
+ const handleOddsClick = (teamData, oddsType, oddsValue, market) => {
+  if (!user) {
+    alert("Please login to place bet");
+    return;
+  }
+
+  setSelectedOdds({
+    team: {
+      team_id: teamData.team_id,
+      name: teamData.name,
+    },
+    back: teamData.back,
+    lay: teamData.lay,
+    back_volume: teamData.back_volume,
+    lay_volume: teamData.lay_volume,
+    oddsType,
+    odds: oddsValue,
+    market,
+    selection_id: teamData.team_id,
+    selection_name: teamData.name,
+  });
+
+  setShowBetSlip(true);
+};
 
   // Handle fancy click
   const handleFancyClick = (item, oddsType, oddsValue) => {
@@ -293,14 +298,22 @@ useEffect(() => {
                           className={`bg-blue-100 font-bold p-2 cursor-pointer hover:bg-blue-200 transition-colors ${
                             updatingCells[`matchodds_${teamKey}_back`] ? 'bg-yellow-200' : ''
                           }`}
-                          onClick={() => handleOddsClick(
-                            teamOdds, 
-                            "back", 
-                            teamOdds?.back, 
-                            "matchodds",
-                            teamOdds?.back_volume,
-                            teamOdds?.lay_volume
-                          )}
+                          onClick={() => 
+                          handleOddsClick(
+  {
+    team_id: team?.team_id,
+    name: team?.name,
+    back: teamOdds?.back,
+    lay: teamOdds?.lay,
+    back_volume: teamOdds?.back_volume,
+    lay_volume: teamOdds?.lay_volume,
+  },
+  "back",
+  teamOdds?.back,
+  "matchodds"
+)
+                        
+                        }
                         >
                           {formatWithAnimation(teamOdds?.back, `matchodds_${teamKey}_back`)}
                         </td>
@@ -308,14 +321,22 @@ useEffect(() => {
                           className={`bg-pink-100 font-bold p-2 cursor-pointer hover:bg-pink-200 transition-colors ${
                             updatingCells[`matchodds_${teamKey}_lay`] ? 'bg-yellow-200' : ''
                           }`}
-                          onClick={() => handleOddsClick(
-                            teamOdds, 
-                            "lay", 
-                            teamOdds?.lay, 
-                            "matchodds",
-                            teamOdds?.back_volume,
-                            teamOdds?.lay_volume
-                          )}
+                           onClick={() => 
+                          handleOddsClick(
+  {
+    team_id: team?.team_id,
+    name: team?.name,
+    back: teamOdds?.back,
+    lay: teamOdds?.lay,
+    back_volume: teamOdds?.back_volume,
+    lay_volume: teamOdds?.lay_volume,
+  },
+  "back",
+  teamOdds?.back,
+  "matchodds"
+)
+                        
+                        }
                         >
                           {formatWithAnimation(teamOdds?.lay, `matchodds_${teamKey}_lay`)}
                         </td>
@@ -366,14 +387,22 @@ useEffect(() => {
                           className={`bg-blue-100 font-bold p-2 cursor-pointer hover:bg-blue-200 transition-colors ${
                             updatingCells[`bookmaker_${teamKey}_back`] ? 'bg-yellow-200' : ''
                           }`}
-                          onClick={() => handleOddsClick(
-                            teamOdds, 
-                            "back", 
-                            teamOdds?.back, 
-                            "bookmaker",
-                            teamOdds?.back_volume,
-                            teamOdds?.lay_volume
-                          )}
+                          onClick={() => 
+                          handleOddsClick(
+  {
+    team_id: team?.team_id,
+    name: team?.name,
+    back: teamOdds?.back,
+    lay: teamOdds?.lay,
+    back_volume: teamOdds?.back_volume,
+    lay_volume: teamOdds?.lay_volume,
+  },
+  "back",
+  teamOdds?.back,
+  "matchodds"
+)
+                        
+                        }
                         >
                           {formatWithAnimation(teamOdds?.back, `bookmaker_${teamKey}_back`)}
                         </td>
@@ -381,14 +410,22 @@ useEffect(() => {
                           className={`bg-pink-100 font-bold p-2 cursor-pointer hover:bg-pink-200 transition-colors ${
                             updatingCells[`bookmaker_${teamKey}_lay`] ? 'bg-yellow-200' : ''
                           }`}
-                          onClick={() => handleOddsClick(
-                            teamOdds, 
-                            "lay", 
-                            teamOdds?.lay, 
-                            "bookmaker",
-                            teamOdds?.back_volume,
-                            teamOdds?.lay_volume
-                          )}
+                          onClick={() => 
+                          handleOddsClick(
+  {
+    team_id: team?.team_id,
+    name: team?.name,
+    back: teamOdds?.back,
+    lay: teamOdds?.lay,
+    back_volume: teamOdds?.back_volume,
+    lay_volume: teamOdds?.lay_volume,
+  },
+  "back",
+  teamOdds?.back,
+  "matchodds"
+)
+                        
+                        }
                         >
                           {formatWithAnimation(teamOdds?.lay, `bookmaker_${teamKey}_lay`)}
                         </td>
@@ -430,14 +467,22 @@ useEffect(() => {
                       className={`bg-blue-100 font-bold p-2 cursor-pointer hover:bg-blue-200 transition-colors ${
                         updatingCells['tiedmatch_back'] ? 'bg-yellow-200' : ''
                       }`}
-                      onClick={() => handleOddsClick(
-                        odds.tiedmatch?.teama, 
-                        "back", 
-                        odds.tiedmatch?.teama?.back, 
-                        "tiedmatch",
-                        odds.tiedmatch?.teama?.back_volume,
-                        odds.tiedmatch?.teama?.lay_volume
-                      )}
+                      onClick={() => 
+                          handleOddsClick(
+  {
+    team_id: team?.team_id,
+    name: team?.name,
+    back: teamOdds?.back,
+    lay: teamOdds?.lay,
+    back_volume: teamOdds?.back_volume,
+    lay_volume: teamOdds?.lay_volume,
+  },
+  "back",
+  teamOdds?.back,
+  "matchodds"
+)
+                        
+                        }
                     >
                       {formatWithAnimation(odds.tiedmatch?.teama?.back, 'tiedmatch_back')}
                     </td>

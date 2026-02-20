@@ -46,6 +46,15 @@ const LoginPage = () => {
       );
 
       if (response.data.success) {
+         const role = response.data.data.account_type;
+
+         
+  if (role === "admin" || role === "agent" || role === "admin_staff") {
+    localStorage.setItem("adminToken", response.data.token);
+    navigate("/admin");
+  } else {
+    setError("Access denied. Not an admin/agent account.");
+  }
         const token = response.data.token;
 
         // Remove user token if exists

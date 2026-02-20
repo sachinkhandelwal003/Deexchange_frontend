@@ -28,6 +28,8 @@ import Login from './components/Login';
 import WinlossReport from './components/Dashboard/Reports/WInLossReport';
 import AdminLogin from './components/AdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
+import ViewBet from './components/Dashboard/Reports/ViewBet';
+import UserOwnBets from './components/Dashboard/Reports/UserOwnBets';
 // --- 1. USER LAYOUT (Main Website Look) ---
 const UserLayout = ({ sidebarOpen, setSidebarOpen }) => (
   <div className="min-h-screen bg-white">
@@ -76,6 +78,8 @@ export default function App() {
           <Route path="/" element={<MainContent />} />
           <Route path="/game/:id" element={<GameDetail />} />
           <Route path="/account-statement" element={<AccountStatement />} />
+                                  <Route path="/bets/my" element={<UserOwnBets />} />
+
         </Route>
 
         {/* --- ADMIN/DASHBOARD ROUTES --- */}
@@ -102,6 +106,9 @@ export default function App() {
           <Route path="/change-password" element={<Forget />} />
             <Route path="/account-reports" element={<Accountreports />} />
             <Route path="/current-bets" element={<Currentbets />} />
+
+                        <Route path="/current-bets/:id" element={<ViewBet />} />
+
             <Route path="/game-report" element={<Gamereport />} />
             <Route path="/general-report" element={<GeneralReport />} />
             <Route path="/casino-report" element={<Casino />} />
