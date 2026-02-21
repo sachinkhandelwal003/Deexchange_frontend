@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (token) => {
     try {
       const res = await axios.get(
-        "http://localhost:3000/api/users/get-profile",
+        "https://devexchangee.in/api/api/users/get-profile",
         {
           headers: { Authorization: `Bearer ${token}` },
         }

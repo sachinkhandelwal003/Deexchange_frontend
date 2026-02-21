@@ -176,7 +176,7 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
       console.log("Placing bet with dynamic data:", betData);
 
       const response = await axios.post(
-        "http://localhost:3000/api/users/make-bet",
+        "https://devexchangee.in/api/api/users/make-bet",
         betData,
         {
           headers: {

@@ -18,7 +18,7 @@ const AccountStatement = () => {
       const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
       
       // Updated API URL as per your request with all params
-      const url = `http://localhost:3000/api/users/get-all-account-statements?page=1&limit=${entriesPerPage}&to=${dateTo}&from=${dateFrom}&search=${searchTerm}`;
+      const url = `https://devexchangee.in/api/api/users/get-all-account-statements?page=1&limit=${entriesPerPage}&to=${dateTo}&from=${dateFrom}&search=${searchTerm}`;
       
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },

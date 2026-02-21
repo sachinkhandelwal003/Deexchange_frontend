@@ -21,7 +21,7 @@ const GeneralReport = () => {
     setLoading(true);
     try {
       // Aapki exact API URL params ke saath
-      const response = await axios.get(`http://localhost:3000/api/admin/admin-account-statement`, {
+      const response = await axios.get(`https://devexchangee.in/api/api/admin/admin-account-statement`, {
         params: {
           limit: entries,
           page: page,

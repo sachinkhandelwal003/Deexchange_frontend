@@ -29,7 +29,7 @@ const navigate = useNavigate();
     try {
       const token = getToken();
       
-      const response = await axios.get('http://localhost:3000/api/admin/get-all-bets', {
+      const response = await axios.get('https://devexchangee.in/api/api/admin/get-all-bets', {
         params: {
           page: page,
           limit: limit,

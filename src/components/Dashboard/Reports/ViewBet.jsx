@@ -29,7 +29,7 @@ const ViewBet = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/admin/get-bet/${id}`,
+        `https://devexchangee.in/api/api/admin/get-bet/${id}`,
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,

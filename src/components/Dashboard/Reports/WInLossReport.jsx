@@ -21,7 +21,7 @@ const UserWinLoss = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
-      const response = await axios.get(`http://localhost:3000/api/admin/user-win-loss`, {
+      const response = await axios.get(`https://devexchangee.in/api/api/admin/user-win-loss`, {
         params: {
           page: 1,
           limit: 100,
@@ -59,8 +59,8 @@ const UserWinLoss = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
       const endpoint = type === 'pdf' 
-        ? 'http://localhost:3000/api/admin/user-win-loss-download-pdf'
-        : 'http://localhost:3000/api/admin/user-win-loss-download-csv';
+        ? 'https://devexchangee.in/api/api/admin/user-win-loss-download-pdf'
+        : 'https://devexchangee.in/api/api/admin/user-win-loss-download-csv';
 
       const response = await axios.get(endpoint, {
         params: {

@@ -36,7 +36,7 @@ const { fetchProfile } = useAuth();
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/users/user-login",
+        "https://devexchangee.in/api/api/users/user-login",
         {
           client_name: formData.username,
           password: formData.password,
@@ -63,7 +63,7 @@ const { fetchProfile } = useAuth();
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/users/demo-login",
+        "https://devexchangee.in/api/api/users/demo-login",
         {
           client_name: "Demo1",
           password: "Password@123",

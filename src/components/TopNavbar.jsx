@@ -21,7 +21,7 @@ export default function TopNavbar({ onMenuClick }) {
         const token = localStorage.getItem("userToken") || localStorage.getItem("token");
         if (!token) return;
 
-        const response = await axios.get("http://localhost:3000/api/users/get-profile", {
+        const response = await axios.get("https://devexchangee.in/api/api/users/get-profile", {
           headers: { Authorization: `Bearer ${token}` }
         });
 
