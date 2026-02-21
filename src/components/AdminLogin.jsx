@@ -38,7 +38,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post(
-        "https://devexchangee.in/api/api/users/admin-login",
+        "http://localhost:3000/api/users/admin-login",
         {
           username: formData.username,
           password: formData.password,

@@ -13,9 +13,8 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
 
-  console.log("matchDatamatchDatamatchData" ,matchData)
-    console.log("selectedOddsselectedOddsselectedOdds" ,selectedOdds)
-  // console.log("matchDatamatchDatamatchData" ,matchData)
+  console.log("matchData", matchData);
+  console.log("selectedOdds", selectedOdds);
 
   // Calculate profit/liability when odds or stake changes
   useEffect(() => {
@@ -66,7 +65,7 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
     } else if (selectedOdds?.market === "tiedmatch") {
       return "Tied Match";
     } else if (selectedOdds?.title) {
-      return selectedOdds.title; // Use fancy title as market name
+      return selectedOdds.title;
     }
     return selectedOdds?.market || "Unknown Market";
   };
@@ -80,10 +79,8 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
     } else if (selectedOdds?.selection_id) {
       return selectedOdds.selection_id;
     }
-    // Fallback: create unique ID from name
     return `${selectedOdds?.market}_${selectedOdds?.team?.name || selectedOdds?.title}`.replace(/\s+/g, '_').toLowerCase();
   };
-
 
   // Generate selection name dynamically
   const getSelectionName = () => {
@@ -126,15 +123,11 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
     setError("");
 
     try {
-      // Get admin_id from user data or use default
       const adminId = user.admin_id || user._id || "6989a57c6fa1cc7c49e4ff79";
-
-      // Get sport type from match data
       const sportType = matchData?.match_info?.format_str?.toLowerCase() || 
                        matchData?.match_info?.competition?.type || 
                        "cricket";
 
-      // Get event details
       const eventId = matchData?.match_info?.match_id?.toString() || 
                      matchData?.match_info?.id?.toString() || 
                      `EVENT_${Date.now()}`;
@@ -143,7 +136,6 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
                        matchData?.match_info?.short_title || 
                        "Unknown Event";
 
-      // Build bet data dynamically
       const betData = {
         user_id: user._id,
         admin_id: adminId,
@@ -158,7 +150,6 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
         bet_sub_type: selectedOdds?.question_id ? "third_party" : "sport",
         odds: parseFloat(odds),
         stake: parseFloat(stake),
-        // Additional dynamic fields that might be useful
         match_format: matchData?.match_info?.format_str,
         competition: matchData?.match_info?.competition?.title,
         team_a: matchData?.match_info?.teama?.name,
@@ -168,7 +159,6 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
         current_score: matchData?.match_info?.live,
       };
 
-      // Add fancy-specific fields if applicable
       if (selectedOdds?.question_id) {
         betData.fancy_id = selectedOdds.question_id;
         betData.fancy_title = selectedOdds.title;
@@ -176,7 +166,6 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
         betData.team_batting = selectedOdds.team_batting;
       }
 
-      // Add volume data if available
       if (selectedOdds?.back_volume) {
         betData.back_volume = selectedOdds.back_volume;
       }
@@ -187,7 +176,7 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
       console.log("Placing bet with dynamic data:", betData);
 
       const response = await axios.post(
-        "https://devexchangee.in/api/api/users/make-bet",
+        "http://localhost:3000/api/users/make-bet",
         betData,
         {
           headers: {
@@ -211,222 +200,145 @@ export default function BettingSlip({ matchData, selectedOdds, onClose }) {
   };
 
   // Update odds when bet type changes
-  useEffect(() => {
-    const currentOdds = getCurrentOdds();
-    if (currentOdds) {
-      setOdds(currentOdds);
-    }
-  }, [betType, selectedOdds]);
+ // 1️⃣ When user clicks different market price
+useEffect(() => {
+  if (selectedOdds) {
+    setBetType(selectedOdds.oddsType || "back");
+    setOdds(selectedOdds.odds || "");
+    setStake("");
+  }
+}, [selectedOdds]);
+
+// 2️⃣ When user manually switches back/lay toggle
+useEffect(() => {
+  const currentOdds = getCurrentOdds();
+  if (currentOdds) {
+    setOdds(currentOdds);
+  }
+}, [betType, selectedOdds]);
 
   return (
     <div className="bg-white shadow rounded overflow-hidden text-sm">
       {/* TOP BAR */}
-      <div className="bg-[#2f4050] text-white px-3 py-2 flex justify-between">
-        <span className="font-semibold">
-          {selectedOdds ? (
-            <>
-              {getSelectionName()} -{" "}
-              {betType === "back" ? "BACK" : "LAY"} @ {odds}
-            </>
-          ) : (
-            "PLACE BET"
-          )}
-        </span>
-        <button onClick={onClose} className="text-white hover:text-gray-300">
-          ✕
-        </button>
+      <div className="bg-[#2f4050] text-white px-3 py-2">
+  <div className="flex justify-between items-center">
+    <div>
+      <div className="font-semibold text-sm">
+        {matchData?.match_info?.title}
       </div>
+      <div className="text-xs text-gray-300">
+        {getMarketName()}
+      </div>
+    </div>
+    <button onClick={onClose} className="text-white text-lg">✕</button>
+  </div>
+</div>
 
       {/* BET BODY */}
-      <div className="bg-pink-300 p-3">
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-xs">
-            {error}
-          </div>
-        )}
+  <div
+  className="p-3 text-xs transition-colors duration-200"
+  style={{
+    backgroundColor: betType === "back" ? "#72BBEF" : "#FAA9BA"
+  }}
+>
 
-        {/* Market Info */}
-        <div className="bg-gray-100 p-2 rounded mb-3 text-xs">
-          <div className="font-semibold">{getMarketName()}</div>
-          <div className="text-gray-600">{matchData?.match_info?.title}</div>
-          {matchData?.match_info?.live && (
-            <div className="text-green-600 mt-1">{matchData.match_info.live}</div>
-          )}
-        </div>
+  {/* Header Row */}
+  <div className="grid grid-cols-4 font-bold mb-1">
+    <div>Bet For</div>
+    <div className="text-center">Odds</div>
+    <div className="text-center">Stake</div>
+    <div className="text-right">
+      {betType === "back" ? "Profit" : "Liability"}
+    </div>
+  </div>
 
-        {/* Bet Type Selector */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <button
-            onClick={() => setBetType("back")}
-            className={`py-2 rounded font-semibold ${
-              betType === "back"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            BACK {selectedOdds?.back && `@ ${selectedOdds.back}`}
-          </button>
-          <button
-            onClick={() => setBetType("lay")}
-            className={`py-2 rounded font-semibold ${
-              betType === "lay"
-                ? "bg-pink-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            LAY {selectedOdds?.lay && `@ ${selectedOdds.lay}`}
-          </button>
-        </div>
+  {/* Bet Row */}
+  <div className="grid grid-cols-4 items-center gap-1 mb-2">
+    <div className="text-red-700 font-bold">
+      {getSelectionName()}
+    </div>
 
-        {/* Bet For */}
-        <div className="text-xs text-gray-700 mb-1">
-          {betType === "back" ? "Backing" : "Laying"}: {getSelectionName()}
-        </div>
+    <input
+      type="number"
+      value={odds}
+      onChange={(e) => setOdds(e.target.value)}
+      className="border p-1 text-center bg-white"
+    />
 
-        {/* Odds + Stake + Profit/Liability */}
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          <div>
-            <div className="text-xs mb-1">Odds</div>
-            <input
-              type="number"
-              value={odds}
-              onChange={(e) => setOdds(e.target.value)}
-              step="0.01"
-              min="1.01"
-              className="w-full p-1 border rounded text-center"
-            />
-          </div>
+    <input
+      type="number"
+      value={stake}
+      onChange={(e) => setStake(e.target.value)}
+      className="border p-1 text-center bg-white"
+    />
 
-          <div>
-            <div className="text-xs mb-1">Stake (₹)</div>
-            <input
-              type="number"
-              value={stake}
-              onChange={(e) => setStake(e.target.value)}
-              min="1"
-              className="w-full p-1 border rounded text-center"
-            />
-          </div>
+    <div className="text-right font-bold">
+      ₹{(betType === "back" ? profit : liability).toFixed(0)}
+    </div>
+  </div>
 
-          <div>
-            <div className="text-xs mb-1">
-              {betType === "back" ? "Profit (₹)" : "Liability (₹)"}
-            </div>
-            <input
-              type="text"
-              value={(betType === "back" ? profit : liability).toFixed(2)}
-              disabled
-              className="w-full p-1 border rounded text-center bg-gray-100"
-            />
-          </div>
-        </div>
+  {/* Quick Buttons */}
+  <div className="grid grid-cols-4 gap-1 mb-2">
+    {[1000, 2000, 5000, 10000, 20000, 25000, 50000, 75000].map((amt) => (
+      <button
+        key={amt}
+        onClick={() => setStake(amt)}
+        className="bg-gray-300 hover:bg-gray-400 py-1"
+      >
+        +{amt / 1000}k
+      </button>
+    ))}
+  </div>
 
-        {/* Volume Info */}
-        {(selectedOdds?.back_volume || selectedOdds?.lay_volume) && (
-          <div className="bg-gray-100 p-2 rounded mb-3 text-xs flex justify-between">
-            {selectedOdds?.back_volume && (
-              <span>Available: ₹{parseFloat(selectedOdds.back_volume).toLocaleString()}</span>
-            )}
-            {selectedOdds?.lay_volume && (
-              <span>Volume: ₹{parseFloat(selectedOdds.lay_volume).toLocaleString()}</span>
-            )}
-          </div>
-        )}
+  <div
+    className="text-right underline cursor-pointer mb-2"
+    onClick={() => setStake("")}
+  >
+    clear
+  </div>
 
-        {/* Quick Amount Buttons */}
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          {[100, 500, 1000, 5000, 10000, 50000].map((amt) => (
-            <button
-              key={amt}
-              onClick={() => quickStake(amt)}
-              className="bg-gray-300 hover:bg-gray-400 rounded py-1 text-xs font-semibold"
-            >
-              +₹{amt.toLocaleString()}
-            </button>
-          ))}
-        </div>
+  {/* Buttons */}
+  <div className="flex justify-between">
+    <button
+      onClick={() => setStake("")}
+      className="bg-teal-600 text-white px-4 py-1"
+    >
+      Edit
+    </button>
 
-        {/* Accept Any Odds */}
-        <div className="flex items-center gap-2 mb-3 text-xs">
-          <input
-            type="checkbox"
-            checked={acceptAnyOdds}
-            onChange={(e) => setAcceptAnyOdds(e.target.checked)}
-          />
-          <span>Accept Any Odds (match current market price)</span>
-        </div>
+    <button
+      onClick={() => setStake("")}
+      className="bg-red-600 text-white px-4 py-1"
+    >
+      Reset
+    </button>
 
-        {/* User Balance Info */}
-        {user && (
-          <div className="bg-gray-100 p-2 rounded mb-3 text-xs">
-            <div className="flex justify-between">
-              <span>Available Balance:</span>
-              <span className="font-bold text-green-600">
-                ₹{user.current_balance?.toLocaleString() || 0}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Current Exposure:</span>
-              <span className="font-bold text-orange-600">
-                ₹{user.used_exposure?.toLocaleString() || 0}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Exposure Limit:</span>
-              <span className="font-bold">
-                ₹{user.exposure_limit?.toLocaleString() || 0}
-              </span>
-            </div>
-            {liability > 0 && (
-              <div className="flex justify-between mt-1 pt-1 border-t">
-                <span>New Exposure:</span>
-                <span className="font-bold text-red-600">
-                  ₹{(user.used_exposure + liability).toLocaleString()}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Buttons */}
-        <div className="flex justify-between">
-          <button
-            onClick={onClose}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded text-sm"
-          >
-            Cancel
-          </button>
-
-          <button
-            onClick={handlePlaceBet}
-            disabled={placing || !stake || stake <= 0 || !odds}
-            className={`bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm ${
-              placing || !stake || stake <= 0 || !odds
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-          >
-            {placing ? "Placing Bet..." : "Place Bet"}
-          </button>
-        </div>
-      </div>
+    <button
+      onClick={handlePlaceBet}
+      disabled={!stake || placing}
+      className="bg-green-600 text-white px-4 py-1 disabled:opacity-50"
+    >
+      {placing ? "Placing..." : "Submit"}
+    </button>
+  </div>
+</div>
 
       {/* MY BET SECTION */}
-      <div className="bg-[#2f4050] text-white px-3 py-2 font-semibold mt-2">
+      <div className="bg-[#2f4050] text-white px-3 py-2 font-semibold">
         MY BETS - {getMarketName()}
       </div>
 
-      <div className="p-2">
-        <select className="w-full border p-1 text-sm rounded mb-2">
+      {/* <div className="p-2">
+        <select className="w-full border p-1.5 text-sm rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-300">
           <option>All Bets</option>
           <option>Matched Bets</option>
           <option>Unmatched Bets</option>
         </select>
         
-        <div className="text-center text-gray-500 text-xs py-2">
+        <div className="text-center text-gray-500 text-xs py-4 bg-gray-50 rounded">
           Your bets for this market will appear here
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

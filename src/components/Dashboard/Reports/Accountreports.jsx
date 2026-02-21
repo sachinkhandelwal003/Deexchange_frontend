@@ -24,7 +24,7 @@ const AccountStatement = () => {
       else if (accountType === 'Withdraw Reports') apiType = 'withdraw_from_user_send_to_admin';
       else if (accountType === 'Credit Reports') apiType = 'set_credit_reference_to_user';
 
-      const response = await axios.get(`https://devexchangee.in/api/api/admin/admin-account-statement`, {
+      const response = await axios.get(`http://localhost:3000/api/admin/admin-account-statement`, {
         params: {
           limit: entriesPerPage,
           client_id: clientId || undefined,

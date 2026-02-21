@@ -9,7 +9,8 @@ export const AuthProvider = ({ children }) => {
 
   // 🔹 Auto load profile if token exists
   useEffect(() => {
-    const token = localStorage.getItem("userToken");
+    const token = localStorage.getItem("userToken")||localStorage.getItem("adminToken");
+
     if (token) {
       fetchProfile(token);
     } else {
@@ -20,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (token) => {
     try {
       const res = await axios.get(
-        "https://devexchangee.in/api/api/users/get-profile",
+        "http://localhost:3000/api/users/get-profile",
         {
           headers: { Authorization: `Bearer ${token}` },
         }

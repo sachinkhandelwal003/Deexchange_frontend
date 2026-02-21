@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
-import TopNavbar from './components/TopNavbar'; // Yeh wahi navbar jo humne pehle edit kiya
+import TopNavbar from './components/TopNavbar';
 import CategoryTabs from './components/CategoryTabs';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent/MainContent';
@@ -14,11 +14,11 @@ import MultiLoginPage from './components/Dashboard/Multilogin';
 import SecureAuth from './components/Dashboard/Masterss/SecureAuth';
 import Forget from './components/Dashboard/Masterss/Forget';
 import Navbar from './components/Dashboard/Navbar';
-import Accountreports from "./components/Dashboard/Reports/Accountreports"
-import Currentbets from "./components/Dashboard/Reports/CurrentBets"
+import Accountreports from "./components/Dashboard/Reports/Accountreports";
+import Currentbets from "./components/Dashboard/Reports/CurrentBets";
 import GeneralReport from './components/Dashboard/Reports/Generalreports';
-import Gamereport from './components/Dashboard/Reports/Gamereports'
-import Casino from './components/Dashboard/Reports/Casinoreports'
+import Gamereport from './components/Dashboard/Reports/Gamereports';
+import Casino from './components/Dashboard/Reports/Casinoreports';
 import Profitloss from './components/Dashboard/Reports/ProfitLoss';
 import Casinoresult from './components/Dashboard/Reports/Casinoresult';
 import GeneralLock from './components/Dashboard/Reports/GeneralLock';
@@ -30,29 +30,56 @@ import AdminLogin from './components/AdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
 import ViewBet from './components/Dashboard/Reports/ViewBet';
 import UserOwnBets from './components/Dashboard/Reports/UserOwnBets';
+
 // --- 1. USER LAYOUT (Main Website Look) ---
-const UserLayout = ({ sidebarOpen, setSidebarOpen }) => (
-  <div className="min-h-screen bg-white">
-    <TopNavbar /> {/* Navbar yahan ek hi baar define hai */}
-    <CategoryTabs />
-    <div className="flex gap-2 pt-1">
-      <div className={`fixed inset-y-0 left-0 z-40 w-72 transform transition-transform lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} `}>
-        <Sidebar onClose={() => setSidebarOpen(false)} />
-      </div>
-      <div className="flex-1 overflow-hidden">
-        <Outlet /> 
+const UserLayout = ({ sidebarOpen, setSidebarOpen }) => {
+  // Handle overlay click to close sidebar
+  const handleOverlayClick = () => {
+    setSidebarOpen(false);
+    document.body.style.overflow = 'unset';
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <TopNavbar onMenuClick={() => setSidebarOpen(true)} />
+      <CategoryTabs />
+      
+      {/* Mobile Overlay */}  
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 bg-opacity-50 z-30 lg:hidden transition-opacity"
+          onClick={handleOverlayClick}
+        />
+      )}
+      
+      <div className="flex gap-2 pt-1">
+        {/* Sidebar - transforms based on open state */}
+        <div 
+          className={`fixed inset-y-0 left-0 z-40 w-72 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <Sidebar onClose={() => {
+            setSidebarOpen(false);
+            document.body.style.overflow = 'unset';
+          }} />
+        </div>
+        
+        {/* Main Content */}
+        <div className="flex-1 overflow-hidden">
+          <Outlet />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // --- 2. ADMIN LAYOUT (Dashboard Look) ---
-// Isme Sidebar nahi hai, sirf Navbar hai jo har page pe dikhega
 const AdminLayout = () => (
   <div className="min-h-screen bg-gray-50">
-    <Navbar /> {/* Navbar yahan bhi fix ho gaya */}
-    <div className="pt-[85px] md:pt-[45px]"> {/* Navbar fixed hai isliye padding zaroori hai */}
-      <Outlet /> 
+    <Navbar />
+    <div className="pt-[85px] md:pt-[45px]">
+      <Outlet />
     </div>
   </div>
 );
@@ -64,61 +91,55 @@ export default function App() {
     <Router>
       <Routes>
         {/* --- CLIENT ROUTES --- */}
-<Route
-  element={
-    <ProtectedRoute type="user">
-      <UserLayout
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-      />
-    </ProtectedRoute>
-  }
->
-     
+        <Route
+          element={
+            <ProtectedRoute type="user">
+              <UserLayout
+                sidebarOpen={sidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+              />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/" element={<MainContent />} />
           <Route path="/game/:id" element={<GameDetail />} />
           <Route path="/account-statement" element={<AccountStatement />} />
-                                  <Route path="/bets/my" element={<UserOwnBets />} />
-
+          <Route path="/bets/my" element={<UserOwnBets />} />
         </Route>
 
-        {/* --- ADMIN/DASHBOARD ROUTES --- */}
-
+        {/* --- PUBLIC ROUTES --- */}
         <Route>
           <Route path="/user/login" element={<Login />} />
           <Route path="/admin-login" element={<AdminLogin />} />
         </Route>
-<Route
-  element={
-    <ProtectedRoute type="admin">
-      <AdminLayout />
-    </ProtectedRoute>
-  }
->
-   
 
-       <Route path="/admin" element={<Dashboard />} />
+        {/* --- ADMIN/DASHBOARD ROUTES --- */}
+        <Route
+          element={
+            <ProtectedRoute type="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/admin" element={<Dashboard />} />
           <Route path="/add-account" element={<AddAccountPage />} />
           <Route path="/assign-agent" element={<AssignAgentPage />} />
           <Route path="/market-analysis" element={<MarketAnalysisPage />} />
           <Route path="/multi-login" element={<MultiLoginPage />} />
           <Route path="/secure-auth" element={<SecureAuth />} />
           <Route path="/change-password" element={<Forget />} />
-            <Route path="/account-reports" element={<Accountreports />} />
-            <Route path="/current-bets" element={<Currentbets />} />
-
-                        <Route path="/current-bets/:id" element={<ViewBet />} />
-
-            <Route path="/game-report" element={<Gamereport />} />
-            <Route path="/general-report" element={<GeneralReport />} />
-            <Route path="/casino-report" element={<Casino />} />
-            <Route path="/profit-loss" element={<Profitloss />} />
-            <Route path="/casino-result" element={<Casinoresult />} />
-        
-            <Route path="/general-lock" element={<GeneralLock />} />
-            <Route path="/registration" element={<Registration />} />
-            <Route path="/total-profit-loss" element={<Total />} />
-                <Route path="/win-loss" element={<WinlossReport />} />
+          <Route path="/account-reports" element={<Accountreports />} />
+          <Route path="/current-bets" element={<Currentbets />} />
+          <Route path="/current-bets/:id" element={<ViewBet />} />
+          <Route path="/game-report" element={<Gamereport />} />
+          <Route path="/general-report" element={<GeneralReport />} />
+          <Route path="/casino-report" element={<Casino />} />
+          <Route path="/profit-loss" element={<Profitloss />} />
+          <Route path="/casino-result" element={<Casinoresult />} />
+          <Route path="/general-lock" element={<GeneralLock />} />
+          <Route path="/registration" element={<Registration />} />
+          <Route path="/total-profit-loss" element={<Total />} />
+          <Route path="/win-loss" element={<WinlossReport />} />
         </Route>
       </Routes>
     </Router>

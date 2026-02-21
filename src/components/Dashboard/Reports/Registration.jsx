@@ -16,7 +16,7 @@ const UserRegisterDetail = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
-      const response = await axios.get(`https://devexchangee.in/api/api/users/get-all-users`, {
+      const response = await axios.get(`http://localhost:3000/api/users/get-all-users`, {
         params: {
           page: page,
           limit: entries,
@@ -47,8 +47,8 @@ const UserRegisterDetail = () => {
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
       const endpoint = type === 'pdf' 
-        ? 'https://devexchangee.in/api/api/admin/download-account-list-pdf'
-        : 'https://devexchangee.in/api/api/admin/download-account-list-excel';
+        ? 'http://localhost:3000/api/admin/download-account-list-pdf'
+        : 'http://localhost:3000/api/admin/download-account-list-excel';
 
       const response = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },

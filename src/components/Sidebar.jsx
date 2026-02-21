@@ -14,7 +14,7 @@ export default function Sidebar({ onClose }) {
   };
 
   return (
-    <aside className=" flex flex-col">
+    <aside className=" flex flex-col bg-[#BBBBBB]">
       {/* Mobile header + close button */}
       <div className="lg:hidden flex items-center justify-between px-5 py-4 border-b border-gray-200">
         <span className="text-lg font-semibold text-gray-800">Menu</span>

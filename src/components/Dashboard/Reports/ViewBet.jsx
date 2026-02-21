@@ -29,7 +29,7 @@ const ViewBet = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://devexchangee.in/api/api/admin/get-bet/${id}`,
+        `http://localhost:3000/api/admin/get-bet/${id}`,
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
@@ -77,7 +77,7 @@ const ViewBet = () => {
 
   const getResultBadge = (result) => {
     const resultConfig = {
-      won: { color: "bg-green-100 text-green-800 border-green-200", icon: FaCheckCircle, text: "Won" },
+      win: { color: "bg-green-100 text-green-800 border-green-200", icon: FaCheckCircle, text: "win" },
       lost: { color: "bg-red-100 text-red-800 border-red-200", icon: FaTimesCircle, text: "Lost" },
       pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", icon: FaHourglassHalf, text: "Pending" },
       cancelled: { color: "bg-gray-100 text-gray-800 border-gray-200", icon: FaTimesCircle, text: "Cancelled" }
@@ -332,7 +332,20 @@ const ViewBet = () => {
                         </button>
                       </div>
                     </div>
-
+<div>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Selection ID</label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="font-mono text-sm bg-gray-50 px-3 py-1.5 rounded border border-gray-200 flex-1">
+                          {bet.selection_id}
+                        </p>
+                        <button
+                          onClick={() => handleCopy(bet.selection_id, "selection")}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <FaCopy className={`w-4 h-4 ${copySuccess === "selection" ? "text-green-500" : ""}`} />
+                        </button>
+                      </div>
+                    </div>
                     <div>
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Market ID</label>
                       <div className="flex items-center gap-2 mt-1">

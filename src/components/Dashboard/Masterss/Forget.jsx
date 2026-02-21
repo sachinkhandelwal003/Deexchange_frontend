@@ -50,7 +50,7 @@ const ChangePassword = () => {
       const token = localStorage.getItem('adminToken');
       
       // API call to change password
-      const response = await axios.post('https://devexchangee.in/api/api/users/admin-change-password', {
+      const response = await axios.post('http://localhost:3000/api/users/admin-change-password', {
         old_password: formData.oldPassword,
         password: formData.newPassword
       }, {
