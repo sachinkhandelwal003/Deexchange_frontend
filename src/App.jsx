@@ -30,6 +30,7 @@ import AdminLogin from './components/AdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
 import ViewBet from './components/Dashboard/Reports/ViewBet';
 import UserOwnBets from './components/Dashboard/Reports/UserOwnBets';
+import UserAccountStatement from './components/Dashboard/Reports/UserAccountStatement';
 
 // --- 1. USER LAYOUT (Main Website Look) ---
 const UserLayout = ({ sidebarOpen, setSidebarOpen }) => {
@@ -129,6 +130,7 @@ export default function App() {
           <Route path="/secure-auth" element={<SecureAuth />} />
           <Route path="/change-password" element={<Forget />} />
           <Route path="/account-reports" element={<Accountreports />} />
+
           <Route path="/current-bets" element={<Currentbets />} />
           <Route path="/current-bets/:id" element={<ViewBet />} />
           <Route path="/game-report" element={<Gamereport />} />

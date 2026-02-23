@@ -71,6 +71,16 @@ export default function TopNavbar({ onMenuClick }) {
         <li className="hover:bg-gray-100 border-b bg-gray-50 px-4 py-2 font-bold text-[#2C3E50]">
           Hi, {userName}
         </li>
+         <li className="hover:bg-gray-100 cursor-pointer">
+          <Link 
+            to="/account-statement" 
+            className="block px-4 py-2" 
+            onClick={() => {
+              onClose();
+            }}
+          >
+Account Statement          </Link>
+        </li>
         <li className="hover:bg-gray-100 cursor-pointer">
           <Link 
             to="/bets/my" 

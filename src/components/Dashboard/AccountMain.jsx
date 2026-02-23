@@ -95,6 +95,7 @@ const confirmDeleteUser = async () => {
     } catch (err) { console.error("Profile Fetch Error:", err); }
   };
 
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -179,20 +180,24 @@ const confirmDeleteUser = async () => {
       }
     } catch (err) { console.error("Status API Error:", err); }
   };
+const inputAmt = parseFloat(formData.amount) || 0;
+const isWithdraw = modalType === 'W';
 
-  // --- CALCULATION LOGIC ---
-  const inputAmt = parseFloat(formData.amount) || 0;
-  const CONSTANT_VAL = 0.62;
-  const isWithdraw = modalType === 'W';
+const adminPrevious = Number(apiBalances.admin_current_balance || 0);
+const userPrevious = Number(apiBalances.user_current_balance || 0);
 
-  let adminFinal = isWithdraw 
-    ? apiBalances.admin_current_balance + inputAmt 
-    : apiBalances.admin_current_balance - CONSTANT_VAL - inputAmt;
+let adminFinal = adminPrevious;
+let userFinal = userPrevious;
 
-  let userFinal = isWithdraw 
-    ? CONSTANT_VAL - inputAmt 
-    : CONSTANT_VAL + inputAmt;
-
+if (!isWithdraw) {
+  // Deposit
+  adminFinal = adminPrevious - inputAmt;
+  userFinal = userPrevious + inputAmt;
+} else {
+  // Withdraw
+  adminFinal = adminPrevious + inputAmt;
+  userFinal = userPrevious - inputAmt;
+}
   // --- SUBMIT LOGIC ---
   const handleSubmit = async () => {
     try {
@@ -205,10 +210,10 @@ const confirmDeleteUser = async () => {
         payload.amount_to_send = inputAmt;
         payload.remark = formData.remark;
         payload.transaction_password = formData.password;
-        payload.admins_previous_amount = apiBalances.admin_current_balance;
-        payload.admins_final_amount = adminFinal;
-        payload.users_previous_amount = CONSTANT_VAL;
-        payload.users_final_amount = userFinal;
+      payload.admins_previous_amount = adminPrevious;
+payload.admins_final_amount = adminFinal;
+payload.users_previous_amount = userPrevious;
+payload.users_final_amount = userFinal;
       } 
       else if (modalType === 'L') {
         url = 'https://devexchangee.in/api/api/admin/set-exposure-limit';
@@ -290,6 +295,7 @@ const confirmDeleteUser = async () => {
                 <th className="px-2 py-3 border-r text-center">U st</th>
                 <th className="px-2 py-3 border-r text-center">B st</th>
                                 <th className="px-2 py-3 border-r text-center">Account Type</th>
+                <th className="px-4 py-3 border-r text-center">Available Balance</th>
 
                 <th className="px-4 py-3 border-r text-center">Exposure</th>
                 <th className="px-4 py-3 border-r text-center">Default (%)</th>
@@ -314,6 +320,8 @@ const confirmDeleteUser = async () => {
     {acc.account_type}
   </span>
 </td>
+                  <td className="px-4 py-2 border-r text-center font-bold">{acc.current_balance || 0}</td>
+
                   <td className="px-4 py-2 border-r text-center font-bold">{acc.exposure_limit || 0}</td>
                   <td className="px-4 py-2 border-r text-center font-bold">{acc.defaultPercent || 0}</td>
                   <td className="px-4 py-2 whitespace-nowrap">
@@ -361,27 +369,73 @@ const confirmDeleteUser = async () => {
 
             <div className="px-10 py-6 space-y-5">
               {(modalType === 'D' || modalType === 'W') && (
-                <>
-                  <div className="flex items-center gap-10">
-                    <label className="w-24 text-[15px] text-gray-800 capitalize font-medium">{adminProfile.client_name}</label>
-                    <div className="flex-1 flex gap-4">
-                      <input disabled value={apiBalances.admin_current_balance} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold text-gray-600" />
-                      <input disabled value={adminFinal.toFixed(2)} className={`w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold ${isWithdraw ? 'text-green-600' : 'text-red-600'}`} />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-10">
-                    <label className="w-24 text-[15px] text-gray-800 capitalize font-medium">{selectedAccount?.client_name}</label>
-                    <div className="flex-1 flex gap-4">
-                      <input disabled value={CONSTANT_VAL} className="w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold text-gray-600" />
-                      <input disabled value={userFinal.toFixed(2)} className={`w-full bg-[#E5E7EB] border border-gray-400 p-2 text-right font-bold ${isWithdraw ? 'text-red-600' : 'text-green-600'}`} />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-10">
-                    <label className="w-24 text-[15px] text-gray-800">Amount</label>
-                    <input type="number" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} className="flex-1 bg-[#F0F7FF] border border-[#B8D1F3] p-2 outline-none font-bold text-blue-700" />
-                  </div>
-                </>
-              )}
+  <>
+    {/* ADMIN ROW */}
+    <div className="flex items-center gap-10">
+      <label className="w-28 text-[15px] font-semibold">
+        {adminProfile.client_name}
+      </label>
+
+      <div className="flex-1 flex gap-4">
+
+        {/* LEFT SIDE = CURRENT BALANCE */}
+        <input
+          disabled
+          value={adminPrevious}
+          className="w-full bg-gray-200 border p-2 text-right font-bold text-gray-600"
+        />
+
+        {/* RIGHT SIDE = FINAL BALANCE */}
+        <input
+          disabled
+          value={adminFinal.toFixed(2)}
+          className={`w-full border p-2 text-right font-bold ${
+            isWithdraw ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"
+          }`}
+        />
+      </div>
+    </div>
+
+    {/* USER ROW */}
+    <div className="flex items-center gap-10">
+      <label className="w-28 text-[15px] font-semibold">
+        {selectedAccount?.client_name}
+      </label>
+
+      <div className="flex-1 flex gap-4">
+
+        {/* LEFT SIDE = CURRENT BALANCE */}
+        <input
+          disabled
+          value={userPrevious}
+          className="w-full bg-gray-200 border p-2 text-right font-bold text-gray-600"
+        />
+
+        {/* RIGHT SIDE = FINAL BALANCE */}
+        <input
+          disabled
+          value={userFinal.toFixed(2)}
+          className={`w-full border p-2 text-right font-bold ${
+            isWithdraw ? "text-red-600 bg-red-50" : "text-green-600 bg-green-50"
+          }`}
+        />
+      </div>
+    </div>
+
+    {/* AMOUNT INPUT */}
+    <div className="flex items-center gap-10">
+      <label className="w-28 text-[15px]">Amount</label>
+      <input
+        type="number"
+        value={formData.amount}
+        onChange={(e) =>
+          setFormData({ ...formData, amount: e.target.value })
+        }
+        className="flex-1 bg-blue-50 border border-blue-300 p-2 outline-none font-bold text-blue-700"
+      />
+    </div>
+  </>
+)}
 
               {modalType === 'L' && (
                 <div className="space-y-4">

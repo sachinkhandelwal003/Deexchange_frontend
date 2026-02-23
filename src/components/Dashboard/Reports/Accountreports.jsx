@@ -118,7 +118,9 @@ const AccountStatement = () => {
                   <th className="p-3 border-r border-gray-200 uppercase">Date</th>
                   <th className="p-3 border-r border-gray-200 uppercase text-green-700">Credit</th>
                   <th className="p-3 border-r border-gray-200 uppercase text-red-700">Debit</th>
-                  <th className="p-3 border-r border-gray-200 uppercase">Closing</th>
+                  <th className="p-3 border-r border-gray-200 uppercase">Balance</th>
+                                    <th className="p-3 border-r border-gray-200 uppercase">From</th>
+
                   <th className="p-3 border-r border-gray-200 uppercase">Description</th>
                   <th className="p-3 uppercase">Details</th>
                 </tr>
@@ -148,8 +150,11 @@ const AccountStatement = () => {
 
                         {/* Closing Logic */}
                         <td className="p-3 border-r border-gray-200 font-bold text-right">
-                          {isCred ? formatNum(row.new_credit) : formatNum(row.users_final_amount || row.admins_final_amount)}
+                          {isCred ? formatNum(row.new_credit) : formatNum( row.admins_final_amount)}
                         </td>
+         <td className="p-3 border-r border-gray-200 font-medium text-gray-700">
+  {row.sender_id?.client_name}/  {row.receiver_id?.client_name}
+</td>
 
                         <td className="p-3 border-r border-gray-200 text-gray-500 italic">
                           {row.remark || (isCred ? `Limit: ${row.old_credit} → ${row.new_credit}` : "Transaction")}
